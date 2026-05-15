@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstraLingo - Galactic Handbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --glass: rgba(15, 23, 42, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --emerald: #10b981;
+        --emerald-glow: rgba(16, 185, 129, 0.4);
+        --fusion-blue: #3b82f6;
+        --fusion-indigo: #6366f1;
+      }
+
+      body {
+        background: radial-gradient(
+          circle at top right,
+          #1e293b,
+          #0f172a,
+          #020617
+        );
+        color: #f8fafc;
+        font-family: "Exo 2", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+        padding-top: 80px; /* Jarak untuk navbar fixed */
+      }
+
+      /* PERBAIKAN NAVBAR: Full Width & Flex */
+      .nav-blur {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
+        left: 0; /* Memastikan nempel ke kiri */
+      }
+
+      .glass-card {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .card-hover:hover {
+        transform: translateY(-8px);
+        background: rgba(30, 41, 59, 0.9);
+        border-color: var(--fusion-blue);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      }
+
+      #modal-overlay,
+      #quiz-overlay,
+      #startup-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.95);
+        backdrop-filter: blur(15px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      #startup-overlay {
+        display: flex;
+      }
+
+      .modal-content-container {
+        max-height: 90vh;
+        overflow-y: auto;
+        width: 100%;
+        max-width: 45rem;
+        animation: modalSlideUp 0.4s ease-out;
+      }
+
+      @keyframes modalSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .read-badge {
+        background: var(--emerald);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        display: none;
+        font-family: "Space Mono", monospace;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px var(--emerald-glow);
+      }
+
+      .is-read .read-badge {
+        display: inline-block;
+      }
+      .is-read {
+        border-color: var(--emerald) !important;
+        background: rgba(16, 185, 129, 0.05);
+      }
+
+      .btn-locked {
+        filter: grayscale(1);
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .btn-unlocked {
+        background: linear-gradient(
+          135deg,
+          var(--fusion-indigo),
+          var(--fusion-blue)
+        );
+        box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+        animation: pulse-blue 2s infinite;
+        cursor: pointer;
+        pointer-events: auto !important;
+      }
+
+      @keyframes pulse-blue {
+        0% {
+          box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(99, 102, 241, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+        }
+      }
+
+      .accent-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--fusion-indigo),
+          var(--fusion-blue)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* Panel Glassmorphism untuk Dropdown */
+      .glass-panel-nav {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 220px;
+        margin-top: 10px;
+        z-index: 100;
+        animation: slideDown 0.3s ease-out forwards;
+      }
+
+      .dropdown-content.active {
+        display: block;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--glass-border);
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR FIXED & FULL WIDTH -->
+    <nav class="fixed top-0 left-0 w-full z-50 nav-blur px-6 py-4">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Brand Logo -->
+        <a
+          href="index.html"
+          class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          <span class="text-3xl">🚀</span>
+          <h1
+            class="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+          >
+            AstraLingo
+          </h1>
+        </a>
+
+        <!-- Menu Links -->
+        <div
+          class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-200"
+        >
+          <a href="index.html" class="hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a href="handbook.html" class="text-blue-400 transition-colors"
+            >Grammar</a
+          >
+          <div class="relative group">
+            <button
+              id="game-btn"
+              onclick="toggleNavbarDropdown(event)"
+              class="flex items-center gap-1 hover:text-blue-400 transition-colors outline-none"
+            >
+              Game
+              <span id="game-arrow" class="transition-transform duration-300"
+                >▾</span
+              >
+            </button>
+            <div
+              id="game-dropdown"
+              class="dropdown-content glass-panel-nav p-2 shadow-2xl"
+            >
+              <a
+                href="mission.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🚀 Galaxy Exploration</a
+              >
+              <a
+                href="whereami.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🧩 Galactic Riddle</a
+              >
+              <a
+                href="phrasalverbs.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🧬 Phrasal Fusion</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="md:hidden text-2xl cursor-pointer text-slate-200">☰</div>
+      </div>
+    </nav>
+
+    <!-- Startup Protocol Modal -->
+    <div id="startup-overlay">
+      <div
+        class="glass-card p-12 max-w-md w-full text-center border-t-4 border-t-blue-500"
+      >
+        <div class="text-5xl mb-6">🛸</div>
+        <h2 class="text-3xl font-bold mb-3 tracking-tight">
+          Handbook Protocol
+        </h2>
+        <p class="text-slate-400 mb-10 text-sm leading-relaxed text-pretty">
+          Welcome back, Cadet. Initialize your session to access the archived
+          mission logs.
+        </p>
+        <div class="space-y-4">
+          <button
+            onclick="closeStartup()"
+            class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/20"
+          >
+            RESUME MISSION
+          </button>
+          <button
+            onclick="resetMission()"
+            class="w-full bg-white/5 hover:bg-red-500/20 border border-white/10 py-4 rounded-xl font-bold transition-all text-slate-400 hover:text-red-400"
+          >
+            WIPE DATA & RESTART
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header & Progress -->
+    <header class="max-w-6xl mx-auto mb-20 text-center mt-12">
+      <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter">
+        Galactic <span class="accent-gradient">Handbook</span>
+      </h1>
+      <p class="text-slate-400 font-light max-w-2xl mx-auto mb-10 text-lg">
+        Master the core English tenses by decoding all 9 mission logs.
+      </p>
+
+      <div class="flex flex-col items-center gap-6">
+        <div
+          class="w-96 max-w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-white/5"
+        >
+          <div
+            id="progress-bar"
+            class="h-full bg-blue-500 rounded-full transition-all duration-1000 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+            style="width: 0%"
+          ></div>
+        </div>
+        <span
+          id="progress-text"
+          class="text-sm font-mono text-blue-400 tracking-[0.2em] font-bold uppercase"
+          >0 / 9 DECODED</span
+        >
+      </div>
+    </header>
+
+    <!-- Map Grid -->
+    <main class="max-w-6xl mx-auto">
+      <div
+        id="grid-container"
+        class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10"
+      >
+        <!-- Dynamic Cards -->
+      </div>
+
+      <section
+        class="py-24 mt-20 border-t border-white/10 text-center text-pretty"
+      >
+        <button
+          id="quiz-btn"
+          onclick="openQuiz()"
+          class="btn-locked px-20 py-6 rounded-full font-bold text-2xl transition-all text-white uppercase tracking-widest shadow-2xl"
+        >
+          🚀 START FINAL ASSESSMENT
+        </button>
+        <p
+          id="lock-msg"
+          class="text-slate-500 mt-8 text-sm font-mono tracking-widest uppercase opacity-60"
+        >
+          Security Lock: Open all data archives first
+        </p>
+      </section>
+    </main>
+
+    <!-- Modal Materi -->
+    <div id="modal-overlay">
+      <div
+        class="glass-card modal-content-container p-12 relative border-l-4 border-l-blue-500 text-left"
+      >
+        <button
+          onclick="closeModal()"
+          class="absolute top-8 right-8 text-slate-500 hover:text-white text-3xl transition-colors"
+        >
+          ✕
+        </button>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Modal Quiz -->
+    <div id="quiz-overlay">
+      <div
+        class="glass-card modal-content-container p-12 relative border-t-4 border-t-emerald-500 text-left"
+      >
+        <button
+          onclick="closeQuiz()"
+          class="absolute top-8 right-8 text-slate-500 hover:text-white text-3xl transition-colors"
+        >
+          ✕
+        </button>
+        <h2
+          class="text-4xl font-black mb-10 text-emerald-400 border-b border-white/5 pb-6"
+        >
+          Final Assessment
+        </h2>
+        <p class="text-slate-400 mb-10 italic">
+          Complete the 10 missions below based on the 9 grammar sectors.
+        </p>
+        <form
+          id="quiz-form"
+          class="space-y-12"
+          onsubmit="event.preventDefault()"
+        ></form>
+        <button
+          onclick="checkAnswers()"
+          class="w-full mt-12 bg-emerald-600 hover:bg-emerald-500 py-5 rounded-2xl font-bold text-xl tracking-widest shadow-2xl transition-all uppercase"
+        >
+          Verify Mission Data
+        </button>
+        <div
+          id="quiz-feedback"
+          class="mt-8 p-6 rounded-2xl hidden text-center font-bold text-lg"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      // Logic Dropdown Navbar
+      function toggleNavbarDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById("game-dropdown");
+        const arrow = document.getElementById("game-arrow");
+        const isActive = dropdown.classList.contains("active");
+        dropdown.classList.toggle("active");
+        if (arrow)
+          arrow.style.transform = isActive ? "rotate(0deg)" : "rotate(180deg)";
+      }
+
+      window.addEventListener("click", function (e) {
+        const dropdown = document.getElementById("game-dropdown");
+        const gameBtn = document.getElementById("game-btn");
+        const arrow = document.getElementById("game-arrow");
+        if (dropdown && dropdown.classList.contains("active")) {
+          if (!gameBtn.contains(e.target)) {
+            dropdown.classList.remove("active");
+            if (arrow) arrow.style.transform = "rotate(0deg)";
+          }
+        }
+      });
+
+      const materials = [
+        {
+          id: 0,
+          lvl: "A1",
+          title: "Present Simple (To Be)",
+          usage: "Describes current status, identity, or feelings.",
+          rules: "Am (I), Is (He/She/It), Are (You/We/They).",
+          structure: "S + To Be + Complement",
+          examples: [
+            "I am a space cadet.",
+            "The ship is ready.",
+            "We are on Mars.",
+          ],
+        },
+        {
+          id: 1,
+          lvl: "A1",
+          title: "Present Simple (Verbs)",
+          usage: "Used for daily routines or universal facts.",
+          rules: "Add -s/-es for He/She/It. Use Do/Does for negatives.",
+          structure: "S + V1 (-s/es)",
+          examples: [
+            "He scans the sun.",
+            "The engine works.",
+            "They study stars.",
+          ],
+        },
+        {
+          id: 2,
+          lvl: "A1",
+          title: "Imperatives",
+          usage: "Direct commands or instructions.",
+          rules: "Starts with Verb 1. No subject needed.",
+          structure: "Verb 1 + Object",
+          examples: [
+            "Press the button.",
+            "Don't open the door.",
+            "Wear your suit.",
+          ],
+        },
+        {
+          id: 3,
+          lvl: "A2",
+          title: "Past Simple",
+          usage: "Completed actions at a specific time in the past.",
+          rules: "V2 (Regular: -ed, Irregular: Varies).",
+          structure: "S + V2",
+          examples: ["We landed in 2024.", "I saw a comet.", "Did you finish?"],
+        },
+        {
+          id: 4,
+          lvl: "A2",
+          title: "Past Continuous",
+          usage: "Actions in progress at a past moment.",
+          rules: "Was/Were + V-ing.",
+          structure: "S + Was/Were + V-ing",
+          examples: ["I was sleeping then.", "They were working."],
+        },
+        {
+          id: 5,
+          lvl: "A2",
+          title: "Comparatives",
+          usage: "Comparing differences between two objects.",
+          rules: "Adj + er (Short), More + Adj (Long). Use 'Than'.",
+          structure: "A is [Comp] than B",
+          examples: [
+            "Jupiter is bigger than Earth.",
+            "Sun is hotter than Moon.",
+          ],
+        },
+        {
+          id: 6,
+          lvl: "B1",
+          title: "Present Perfect",
+          usage: "Past actions linked to now or unspecified time.",
+          rules: "Have/Has + V3.",
+          structure: "S + Have/Has + V3",
+          examples: ["I have seen Pluto.", "She has left Earth."],
+        },
+        {
+          id: 7,
+          lvl: "B1",
+          title: "Conditionals",
+          usage: "Logic of cause and effect (Facts or Possibilities).",
+          rules: "Type 0: Facts. Type 1: Future Possibilities.",
+          structure: "If X happens, Y occurs.",
+          examples: ["If it rains, we stay.", "If you heat ice, it melts."],
+        },
+        {
+          id: 8,
+          lvl: "B1",
+          title: "Passive Voice",
+          usage: "Focus on object/action instead of doer.",
+          rules: "To Be (Tense) + Verb 3.",
+          structure: "Object + To Be + V3",
+          examples: ["The core is repaired.", "Data was received."],
+        },
+      ];
+
+      let readMaterials = new Set(
+        JSON.parse(localStorage.getItem("astralingo_final_quiz_v12") || "[]"),
+      );
+
+      function renderGrid() {
+        const container = document.getElementById("grid-container");
+        container.innerHTML = materials
+          .map(
+            (m) => `
+                <div onclick="openModal(${m.id})" class="glass-card card-hover p-12 cursor-pointer relative ${readMaterials.has(m.id) ? "is-read" : ""}" id="card-${m.id}">
+                    <span class="read-badge absolute top-8 right-8">DECODED</span>
+                    <div class="text-5xl mb-8 font-black ${m.lvl === "A1" ? "text-blue-400" : m.lvl === "A2" ? "text-indigo-400" : "text-cyan-400"}">0${m.id + 1}</div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight">${m.title}</h3>
+                    <p class="text-sm text-slate-500 tracking-[0.3em] font-mono uppercase">Log Sector ${m.lvl}</p>
+                </div>
+            `,
+          )
+          .join("");
+        updateUI();
+      }
+
+      function updateUI() {
+        const count = readMaterials.size;
+        const progress = (count / 9) * 100;
+        document.getElementById("progress-bar").style.width = `${progress}%`;
+        document.getElementById("progress-text").innerText =
+          `${count} / 9 DECODED`;
+
+        const btn = document.getElementById("quiz-btn");
+        const msg = document.getElementById("lock-msg");
+
+        if (count === 9) {
+          btn.className =
+            "btn-unlocked px-20 py-6 rounded-full font-bold text-2xl transition-all text-white uppercase tracking-widest";
+          msg.innerText = "System Integrity Verified: Mission Ready";
+          msg.classList.replace("text-slate-500", "text-blue-400");
+        } else {
+          btn.className =
+            "btn-locked px-20 py-6 rounded-full font-bold text-2xl transition-all text-white uppercase tracking-widest";
+          msg.innerText = "Security Lock: Open all data archives first";
+          msg.classList.replace("text-blue-400", "text-slate-500");
+        }
+      }
+
+      function resetMission() {
+        readMaterials.clear();
+        localStorage.removeItem("astralingo_final_quiz_v12");
+        renderGrid();
+        closeStartup();
+      }
+
+      function closeStartup() {
+        document.getElementById("startup-overlay").style.display = "none";
+      }
+
+      function openModal(idx) {
+        const m = materials[idx];
+        document.getElementById("modal-body").innerHTML = `
+                <h2 class="text-5xl font-black text-white mb-4 tracking-tighter">${m.title}</h2>
+                <div class="space-y-10 text-slate-300 mt-12 leading-relaxed text-left">
+                    <div class="bg-blue-500/5 border-l-4 border-blue-500 p-6 rounded-r-2xl">
+                        <h4 class="text-blue-400 font-bold uppercase text-xs tracking-widest mb-2">Protocol Function</h4>
+                        <p class="text-xl text-white font-medium">${m.usage}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-slate-900/50 p-8 rounded-3xl border border-white/5">
+                            <h4 class="text-indigo-400 font-bold uppercase text-xs tracking-widest mb-4">Archive Protocol</h4>
+                            <p class="text-md opacity-90">${m.rules}</p>
+                        </div>
+                        <div class="bg-slate-900/50 p-8 rounded-3xl border border-white/5">
+                            <h4 class="text-cyan-400 font-bold uppercase text-xs tracking-widest mb-4">Sentence Mapping</h4>
+                            <p class="text-lg font-mono text-blue-200">${m.structure}</p>
+                        </div>
+                    </div>
+                    <div class="p-10 bg-slate-900/80 border border-white/10 rounded-[2.5rem] shadow-inner">
+                        <h4 class="text-slate-500 font-bold uppercase text-xs tracking-widest mb-8 text-center">Reference Logs</h4>
+                        <div class="text-lg italic space-y-6">
+                             ${m.examples.map((ex) => `<div class="flex gap-4 items-center"><span class="w-2 h-2 bg-blue-500 rounded-full"></span><span>${ex}</span></div>`).join("")}
+                        </div>
+                    </div>
+                </div>
+                <button onclick="markRead(${idx})" class="w-full mt-16 bg-blue-600 hover:bg-blue-500 py-6 rounded-2xl font-bold text-xl tracking-widest shadow-2xl transition-all uppercase">Confirm Decoded</button>
+            `;
+        document.getElementById("modal-overlay").style.display = "flex";
+      }
+
+      function markRead(idx) {
+        readMaterials.add(idx);
+        localStorage.setItem(
+          "astralingo_final_quiz_v12",
+          JSON.stringify([...readMaterials]),
+        );
+        renderGrid();
+        closeModal();
+      }
+
+      function openQuiz() {
+        if (readMaterials.size < 9) return;
+        const form = document.getElementById("quiz-form");
+        form.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">1. [To Be] The captain _______ (be) in the cockpit right now.</p>
+                    <input type="text" id="q0" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all" placeholder="Enter answer...">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">2. [Verb Routine] The robot _______ (clean) the laboratory every night.</p>
+                    <input type="text" id="q1" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">3. [Imperative] _______ (press) the blue button to activate the shield.</p>
+                    <input type="text" id="q2" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">4. [Past Simple] They _______ (find) an ancient artifact on Mars yesterday.</p>
+                    <input type="text" id="q3" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">5. [Past Continuous] What _______ you _______ (do) when the alarm rang?</p>
+                    <input type="text" id="q4" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all" placeholder="e.g. were ... doing">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">6. [Comparative] Jupiter is _______ (big) than Earth.</p>
+                    <input type="text" id="q5" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">7. [Present Perfect] We _______ (discover) a new galaxy recently.</p>
+                    <input type="text" id="q6" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">8. [Conditional] If you heat ice, it _______ (melt).</p>
+                    <input type="text" id="q7" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">9. [Passive Voice] The ship _______ (repair) by droids two hours ago.</p>
+                    <input type="text" id="q8" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+                <div class="space-y-4">
+                    <p class="text-slate-200 text-xl font-medium">10. [Review] I _______ (never/be) to this part of the universe before.</p>
+                    <input type="text" id="q9" class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-6 outline-none focus:border-blue-500 text-white text-lg transition-all">
+                </div>
+            `;
+        document.getElementById("quiz-overlay").style.display = "flex";
+      }
+
+      function checkAnswers() {
+        const sol = [
+          ["is"],
+          ["cleans"],
+          ["press"],
+          ["found"],
+          ["were doing", "were you doing"],
+          ["bigger"],
+          ["have discovered", "ve discovered"],
+          ["melts"],
+          ["was repaired"],
+          ["have never been", "ve never been", "haven't been"],
+        ];
+        let score = 0;
+        for (let i = 0; i < 10; i++) {
+          const val = document
+            .getElementById(`q${i}`)
+            .value.toLowerCase()
+            .trim();
+          const isCorrect = sol[i].some((s) => val === s || val.includes(s));
+          const el = document.getElementById(`q${i}`);
+          if (isCorrect) {
+            score++;
+            el.style.borderColor = "#10b981";
+            el.style.background = "rgba(16, 185, 129, 0.1)";
+          } else {
+            el.style.borderColor = "#ef4444";
+            el.style.background = "rgba(239, 68, 68, 0.1)";
+          }
+        }
+        const fb = document.getElementById("quiz-feedback");
+        fb.classList.remove("hidden");
+        if (score === 10) {
+          fb.innerHTML = "🏆 MISSION SUCCESS! ALL DATA SYNCHRONIZED.";
+          fb.className =
+            "mt-8 p-8 rounded-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500";
+        } else {
+          fb.innerHTML = `⚠️ ACCESS DENIED: ${score}/10 CORRECT. RE-READ ARCHIVES.`;
+          fb.className =
+            "mt-8 p-8 rounded-3xl bg-red-500/20 text-red-400 border border-red-500";
+        }
+      }
+
+      function closeModal() {
+        document.getElementById("modal-overlay").style.display = "none";
+      }
+      function closeQuiz() {
+        document.getElementById("quiz-overlay").style.display = "none";
+      }
+
+      window.onload = renderGrid;
+    </script>
+  </body>
+</html>

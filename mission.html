@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstraLingo: Planet Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --glass: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --emerald: #10b981;
+        --emerald-glow: rgba(16, 185, 129, 0.4);
+        --soft-red: #f87171;
+        --amber-glow: rgba(245, 158, 11, 0.5);
+      }
+
+      body {
+        font-family: "Exo 2", sans-serif;
+        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .stars {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("https://www.transparenttextures.com/patterns/stardust.png");
+        pointer-events: none;
+        opacity: 0.3;
+        z-index: 0;
+      }
+
+      .glass {
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+      }
+
+      /* Map Styles */
+      #galaxy-map {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        aspect-ratio: 16/9;
+        min-height: 420px;
+      }
+
+      .orbit-path {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .planet {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        z-index: 10;
+      }
+
+      .planet:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      }
+
+      .planet.locked {
+        filter: grayscale(1) blur(3px) brightness(0.5);
+        cursor: not-allowed;
+      }
+
+      .planet.unstable {
+        animation: pulse-amber 1.5s infinite;
+      }
+
+      @keyframes pulse-amber {
+        0%,
+        100% {
+          box-shadow: 0 0 10px var(--amber-glow);
+          border: 2px solid #f59e0b;
+        }
+        50% {
+          box-shadow: 0 0 25px var(--amber-glow);
+          border: 2px solid #fbbf24;
+        }
+      }
+
+      .mission-preview {
+        position: absolute;
+        bottom: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 180px;
+        padding: 10px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        text-align: center;
+        z-index: 20;
+      }
+
+      .planet:hover .mission-preview {
+        opacity: 1;
+      }
+
+      /* Word Jumble */
+      .word-chip {
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+      }
+      .word-chip:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .word-chip.used {
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
+      .target-zone {
+        min-height: 80px;
+        border: 2px dashed var(--glass-border);
+        border-radius: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 15px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .target-zone.success {
+        border-color: var(--emerald);
+        background: rgba(16, 185, 129, 0.1);
+        animation: bounce 0.5s;
+      }
+      .target-zone.error {
+        border-color: var(--soft-red);
+        background: rgba(248, 113, 113, 0.1);
+        animation: shake 0.4s;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      .nav-blur {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .success-overlay {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .artifact-card {
+        transition: all 0.3s ease;
+      }
+      .artifact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      }
+
+      /* Dropdown custom fix */
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 220px;
+        padding-top: 1rem; /* Spacing bridge for hover */
+        z-index: 60;
+      }
+
+      .group:hover .dropdown-content {
+        display: block;
+      }
+
+      .dropdown-inner {
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 0.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 nav-blur px-6 py-4">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Left Side: Logo & Main Nav -->
+        <div class="flex items-center gap-10">
+          <a
+            href="index.html"
+            class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <span class="text-3xl">🚀</span>
+            <h1
+              class="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+            >
+              AstraLingo
+            </h1>
+          </a>
+
+          <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+            <a
+              href="index.html"
+              class="text-blue-400 hover:text-blue-300 transition-colors"
+              >Home</a
+            >
+            <a
+              href="handbook.html"
+              class="hover:text-blue-400 transition-colors"
+              >Grammar</a
+            >
+            <div class="relative group">
+              <button
+                class="flex items-center gap-1 hover:text-blue-400 transition-colors outline-none py-2"
+              >
+                Games <span class="text-[10px] opacity-50">▼</span>
+              </button>
+              <div class="dropdown-content">
+                <div class="dropdown-inner">
+                  <a
+                    href="index.html"
+                    class="block px-4 py-3 bg-white/10 rounded-xl transition-colors text-xs mb-1 hover:bg-white/20"
+                    >🚀 Galaxy Exploration</a
+                  >
+                  <a
+                    href="whereami.html"
+                    class="block px-4 py-3 hover:bg-white/10 rounded-xl transition-colors text-xs mb-1"
+                    >🧩 Galactic Riddle</a
+                  >
+                  <a
+                    href="phrasalverbs.html"
+                    class="block px-4 py-3 hover:bg-white/10 rounded-xl transition-colors text-xs"
+                    >🧬 Phrasal Fusion</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Status Panel (Fuel & Streak) -->
+        <div class="flex items-center gap-6">
+          <div
+            class="hidden sm:flex items-center gap-2 glass px-4 py-1.5 rounded-full border-blue-500/30"
+          >
+            <span
+              class="text-[10px] font-mono text-blue-400 font-bold uppercase tracking-tighter"
+              >Warp Fuel</span
+            >
+            <div class="w-24 h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                id="fuel-gauge"
+                class="h-full bg-blue-500 transition-all duration-500 shadow-[0_0_10px_#3b82f6]"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="fuel-text" class="text-[10px] font-mono">0/60</span>
+          </div>
+          <div
+            id="streak-display"
+            class="flex items-center gap-1 text-orange-400 font-bold glass px-3 py-1 rounded-full border-orange-500/20"
+          >
+            <span>🔥</span> <span id="streak-count" class="text-sm">1</span>
+          </div>
+          <div class="md:hidden text-2xl cursor-pointer">☰</div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pt-28 px-6 max-w-7xl mx-auto pb-20">
+      <!-- Galaxy Map Section -->
+      <section id="map-section">
+        <div class="text-center mb-10">
+          <h2 class="text-3xl font-bold mb-2">Galaxy Exploration</h2>
+          <p class="text-slate-400">
+            Complete missions across the galaxy. Higher systems require
+            significant Warp Fuel.
+          </p>
+        </div>
+
+        <div id="galaxy-map">
+          <!-- Orbits -->
+          <div class="orbit-path" style="width: 250px; height: 250px"></div>
+          <div class="orbit-path" style="width: 450px; height: 450px"></div>
+          <div class="orbit-path" style="width: 650px; height: 650px"></div>
+          <div class="orbit-path" style="width: 850px; height: 850px"></div>
+
+          <!-- Central Sun -->
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none"
+          >
+            <div
+              class="text-[10px] uppercase tracking-[0.3em] text-slate-500 mb-1"
+            >
+              Central Hub
+            </div>
+            <div
+              class="w-16 h-16 bg-white/5 rounded-full blur-xl absolute -z-10 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"
+            ></div>
+            <span class="text-4xl">☀️</span>
+          </div>
+
+          <div id="planets-container">
+            <!-- Planets injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Vocab Vault Section -->
+      <section class="mt-20">
+        <div class="flex justify-between items-end mb-8">
+          <div>
+            <h2 class="text-2xl font-bold">Vocab Vault</h2>
+            <p class="text-slate-400 text-sm">
+              Artifacts discovered during your travels.
+            </p>
+          </div>
+          <div
+            id="vault-stats"
+            class="text-xs font-mono text-slate-500 uppercase"
+          >
+            0 Artifacts Found
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div class="lg:col-span-1 glass p-6 space-y-6">
+            <div>
+              <h3
+                class="text-xs font-mono text-blue-400 uppercase tracking-widest mb-4"
+              >
+                Logbook
+              </h3>
+              <div id="badges-container" class="flex flex-wrap gap-2"></div>
+            </div>
+            <hr class="border-white/10" />
+            <div>
+              <h3
+                class="text-xs font-mono text-blue-400 uppercase tracking-widest mb-2"
+              >
+                System Status
+              </h3>
+              <p id="status-msg" class="text-sm text-slate-300">
+                Scanning sectors...
+              </p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-3">
+            <div
+              id="artifacts-grid"
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+            >
+              <!-- Cards injected here -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div
+      id="modal-overlay"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-6"
+    >
+      <div
+        id="mission-modal"
+        class="glass max-w-lg w-full p-8 relative overflow-hidden"
+      >
+        <button
+          onclick="closeModal()"
+          class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors z-[110]"
+        >
+          ✕
+        </button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
+    <!-- Alert -->
+    <div
+      id="custom-alert"
+      class="fixed bottom-10 left-1/2 -translate-x-1/2 glass px-6 py-4 border-red-500/50 text-red-200 hidden z-[200] flex items-center gap-4"
+    >
+      <span>⚠️</span>
+      <span id="alert-text">Insufficient Fuel!</span>
+      <button onclick="hideAlert()" class="ml-4 opacity-50 hover:opacity-100">
+        Dismiss
+      </button>
+    </div>
+
+    <script>
+      const VOCAB_DATA = {
+        Space: "The vast area outside Earth's atmosphere.",
+        Cadet: "A student training to become an officer.",
+        Star: "A giant ball of hot gas in the galaxy.",
+        Pilot: "A person who operates the ship.",
+        Astronaut: "A person trained to travel in a spacecraft.",
+        Clock: "A device used to measure and show time.",
+        Hour: "A period of time equal to 60 minutes.",
+        Minute: "A period of time equal to 60 seconds.",
+        Time: "The continuous sequence of events.",
+        Second: "A very short unit of time.",
+        Shop: "A place where you buy goods or services.",
+        Buy: "To get something by paying money.",
+        Sell: "To give something in exchange for money.",
+        Market: "An open area where people buy and sell.",
+        Price: "The amount of money something costs.",
+        Past: "The time before the present.",
+        History: "The study of past events.",
+        Log: "An official record of events during a trip.",
+        Story: "A description of events, real or imaginary.",
+        Memory: "Something that you remember.",
+        View: "An opinion or a way of looking at something.",
+        Think: "To use your mind to form ideas.",
+        Believe: "To feel sure that something is true.",
+        Agree: "To have the same opinion as someone else.",
+        Advice: "A suggestion about what someone should do.",
+        Logic: "A sensible way of thinking about something.",
+        Task: "A piece of work to be done.",
+        Goal: "Something that you hope to achieve.",
+        Success: "The achievement of a desired aim.",
+        Proof: "Information that shows something is true.",
+      };
+
+      const DATA = {
+        systems: [
+          { id: "a1", name: "Inner Core", color: "#10b981", minFuel: 0 },
+          { id: "a2", name: "Trade Belt", color: "#3b82f6", minFuel: 15 },
+          { id: "b1", name: "Outer Rim", color: "#f59e0b", minFuel: 40 },
+          { id: "b2", name: "Command Center", color: "#ef4444", minFuel: 50 },
+        ],
+        planets: [
+          {
+            id: "p1",
+            sys: "a1",
+            name: "Alpha",
+            icon: "🌍",
+            mission: 'Master "To Be"',
+            vocab: ["Space", "Cadet", "Star", "Pilot", "Astronaut"],
+            missions: [
+              "I am a space cadet",
+              "You are a brave pilot",
+              "He is the mission commander",
+              "She is a talented scientist",
+              "It is a giant planet",
+              "We are ready to launch",
+              "They are far from home",
+              "The sky is very dark",
+              "This is my favorite star",
+              "Stars are bright in space",
+            ],
+          },
+          {
+            id: "p2",
+            sys: "a1",
+            name: "Chronos",
+            icon: "⏳",
+            mission: "Telling Time",
+            vocab: ["Clock", "Hour", "Minute", "Time", "Second"],
+            missions: [
+              "It is ten o clock",
+              "The launch is at noon",
+              "I get up at sunrise",
+              "The clock says five minutes",
+              "We arrive in two hours",
+              "Time goes fast in space",
+              "It is midnight on Mars",
+              "The meeting is at seven",
+              "Dinner is at six thirty",
+              "Set the timer for ten",
+            ],
+          },
+          {
+            id: "p3",
+            sys: "a2",
+            name: "Agora",
+            icon: "🏪",
+            mission: "Shopping Basics",
+            vocab: ["Shop", "Buy", "Sell", "Market", "Price"],
+            missions: [
+              "I want to buy bread",
+              "How much is this apple",
+              "I need a new battery",
+              "This shop sells space suits",
+              "We go to the market",
+              "The price is too high",
+              "I have ten gold coins",
+              "Can I pay with credit",
+              "The store is closed now",
+              "Where is the shopping bag",
+            ],
+          },
+          {
+            id: "p4",
+            sys: "a2",
+            name: "Memoir",
+            icon: "📜",
+            mission: "Past Simple",
+            vocab: ["Past", "History", "Log", "Story", "Memory"],
+            missions: [
+              "We traveled to Mars yesterday",
+              "I saw a bright comet",
+              "They built a base here",
+              "He ate space food",
+              "The ship landed safely",
+              "I heard a strange sound",
+              "We found a hidden map",
+              "She wrote a mission log",
+              "The aliens arrived last night",
+              "We finished the first phase",
+            ],
+          },
+          {
+            id: "p5",
+            sys: "b1",
+            name: "Opinion",
+            icon: "💭",
+            mission: "Giving Views",
+            vocab: ["View", "Think", "Believe", "Agree", "Advice"],
+            missions: [
+              "I think it is great",
+              "In my opinion it works",
+              "I believe we can win",
+              "I agree with your plan",
+              "It seems like a star",
+              "I am sure about this",
+              "This mission is very important",
+              "Do you agree with me",
+              "I don't think so",
+              "That is a good idea",
+            ],
+          },
+          {
+            id: "p6",
+            sys: "b2",
+            name: "Rhetoric",
+            icon: "🏛️",
+            mission: "Formal Logic",
+            vocab: ["Logic", "Task", "Goal", "Success", "Proof"],
+            missions: [
+              "The mission must be completed",
+              "Safety is the main priority",
+              "We must follow the rules",
+              "This action is highly logical",
+              "Therefore we should stay here",
+              "We need to find proof",
+              "The evidence is very clear",
+              "Success depends on hard work",
+              "We should consider the risks",
+              "The conclusion is quite obvious",
+            ],
+          },
+        ],
+      };
+
+      const state = {
+        fuel: 0,
+        streak: 1,
+        completedPlanets: [],
+        unstablePlanets: [],
+        discoveredVocab: [],
+        questionProgress: {},
+        lastLogin: Date.now(),
+      };
+
+      function init() {
+        loadProgress();
+        renderMap();
+        renderVault();
+        updateUI();
+        setInterval(checkStability, 45000);
+      }
+
+      function renderMap() {
+        const container = document.getElementById("planets-container");
+        container.innerHTML = "";
+        DATA.planets.forEach((p, index) => {
+          const system = DATA.systems.find((s) => s.id === p.sys);
+          const isLocked = state.fuel < system.minFuel;
+          const isCompleted = state.completedPlanets.includes(p.id);
+          const isUnstable = state.unstablePlanets.includes(p.id);
+          const progress = state.questionProgress[p.id]
+            ? state.questionProgress[p.id].length
+            : 0;
+          const orbitRadius = 125 + DATA.systems.indexOf(system) * 100;
+          const angle = index * (360 / DATA.planets.length) * (Math.PI / 180);
+          const x = Math.cos(angle) * orbitRadius;
+          const y = Math.sin(angle) * orbitRadius;
+          const div = document.createElement("div");
+          div.className = `planet ${isLocked ? "locked" : ""} ${isUnstable ? "unstable" : ""}`;
+          div.style.left = `calc(50% + ${x}px - 30px)`;
+          div.style.top = `calc(50% + ${y}px - 30px)`;
+          if (!isLocked) {
+            div.style.background = isCompleted
+              ? system.color
+              : "rgba(255,255,255,0.1)";
+            if (isCompleted) div.style.boxShadow = `0 0 15px ${system.color}66`;
+            div.onclick = () => handlePlanetClick(p);
+          } else {
+            div.onclick = () =>
+              showAlert(
+                `Warp Drive Offline! Reach ${system.minFuel} Fuel to unlock ${system.name}.`,
+              );
+          }
+          div.innerHTML = `<span>${p.icon}</span><div class="mission-preview"><div class="text-[10px] text-blue-400 font-mono">PLANET ${p.name.toUpperCase()}</div><div class="text-sm font-bold mt-1">${p.mission}</div><div class="text-[10px] text-slate-500 mt-1">Progress: ${progress}/10</div><div class="text-[10px] text-slate-400 mt-2 font-bold">${isLocked ? `🔒 Needs ${system.minFuel} Fuel` : isUnstable ? "⚠️ Unstable" : progress >= 10 ? "✅ Mastered" : "🚀 Active"}</div></div>`;
+          container.appendChild(div);
+        });
+      }
+
+      function handlePlanetClick(planet) {
+        if (state.unstablePlanets.includes(planet.id)) openReviewModal(planet);
+        else openMissionModal(planet);
+      }
+
+      function openMissionModal(planet) {
+        const overlay = document.getElementById("modal-overlay");
+        const content = document.getElementById("modal-content");
+        overlay.classList.remove("hidden");
+        overlay.classList.add("flex");
+        let missionIndex = getNextMissionIndex(planet);
+        if (missionIndex === -1)
+          missionIndex = Math.floor(Math.random() * planet.missions.length);
+        const sentence = planet.missions[missionIndex];
+        const words = sentence.split(" ");
+        const shuffled = [...words].sort(() => Math.random() - 0.5);
+        content.innerHTML = `<div class="text-center"><span class="text-4xl mb-4 block animate-pulse">${planet.icon}</span><h3 class="text-2xl font-bold mb-2">Planet ${planet.name}</h3><p class="text-slate-400 mb-2">Mission ${missionIndex + 1} of 10</p><p class="text-blue-400 text-sm font-mono uppercase tracking-widest mb-8">${planet.mission}</p><div id="jumble-target" class="target-zone mb-6"></div><div id="jumble-source" class="flex flex-wrap justify-center gap-3 mb-10">${shuffled.map((w, i) => `<button class="word-chip glass" onclick="selectWord('${w}', ${i}, this)">${w}</button>`).join("")}</div><div class="flex gap-4"><button class="flex-1 py-3 glass rounded-xl font-bold hover:bg-white/10 transition-all" onclick="resetJumble()">RESET</button><button id="check-btn" class="flex-[2] py-3 bg-indigo-600 rounded-xl font-bold opacity-50 cursor-not-allowed transition-all" onclick="checkSentence()">DECODE SIGNAL</button></div></div>`;
+        window.currentMissionData = { planet, sentence, index: missionIndex };
+        window.currentSelection = [];
+      }
+
+      function selectWord(word, index, btn) {
+        if (btn.classList.contains("used")) return;
+        btn.classList.add("used");
+        window.currentSelection.push(word);
+        const chip = document.createElement("span");
+        chip.className =
+          "word-chip bg-indigo-500/30 border-indigo-500/50 cursor-default";
+        chip.innerText = word;
+        document.getElementById("jumble-target").appendChild(chip);
+        if (
+          window.currentSelection.length ===
+          window.currentMissionData.sentence.split(" ").length
+        )
+          document
+            .getElementById("check-btn")
+            .classList.remove("opacity-50", "cursor-not-allowed");
+      }
+
+      function checkSentence() {
+        const target = document.getElementById("jumble-target");
+        if (
+          window.currentSelection.join(" ") ===
+          window.currentMissionData.sentence
+        ) {
+          target.classList.add("success");
+          showSuccessState();
+        } else {
+          target.classList.add("error");
+          setTimeout(() => {
+            target.classList.remove("error");
+            resetJumble();
+          }, 500);
+        }
+      }
+
+      function showSuccessState() {
+        const content = document.getElementById("modal-content");
+        const planet = window.currentMissionData.planet;
+        processMissionCompletion(planet, window.currentMissionData.index);
+        const nextIndex = getNextMissionIndex(planet);
+        setTimeout(() => {
+          content.innerHTML = `<div class="text-center success-overlay py-8"><div class="w-20 h-20 bg-emerald-500/20 border border-emerald-500/50 rounded-full flex items-center justify-center mx-auto mb-6"><span class="text-4xl">✅</span></div><h3 class="text-2xl font-bold text-emerald-400 mb-2">Success! +1 Warp Fuel</h3><p class="text-slate-400 mb-8">${nextIndex === -1 ? "This sector is now fully secured." : "Signal stabilized. Ready for next jump?"}</p><div class="space-y-4">${nextIndex !== -1 ? `<button class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20" onclick="openMissionModalById('${planet.id}')">NEXT MISSION 🚀</button>` : ""}<button class="w-full py-3 glass rounded-xl font-bold hover:bg-white/10 transition-all" onclick="closeModal()">BACK TO GALAXY MAP</button></div></div>`;
+        }, 600);
+      }
+
+      function processMissionCompletion(planet, missionIndex) {
+        if (!state.questionProgress[planet.id])
+          state.questionProgress[planet.id] = [];
+        if (!state.questionProgress[planet.id].includes(missionIndex)) {
+          state.questionProgress[planet.id].push(missionIndex);
+          state.fuel = Math.min(60, state.fuel + 1);
+          if (!state.completedPlanets.includes(planet.id))
+            state.completedPlanets.push(planet.id);
+          planet.vocab.forEach((v) => {
+            if (!state.discoveredVocab.includes(v))
+              state.discoveredVocab.push(v);
+          });
+          setTimeout(() => markAsUnstable(planet.id), 90000);
+        }
+        saveProgress();
+        renderMap();
+        renderVault();
+        updateUI();
+      }
+
+      function getNextMissionIndex(planet) {
+        let completed = state.questionProgress[planet.id] || [];
+        for (let i = 0; i < planet.missions.length; i++)
+          if (!completed.includes(i)) return i;
+        return -1;
+      }
+
+      function openMissionModalById(id) {
+        openMissionModal(DATA.planets.find((p) => p.id === id));
+      }
+
+      function openReviewModal(planet) {
+        const overlay = document.getElementById("modal-overlay");
+        const content = document.getElementById("modal-content");
+        overlay.classList.remove("hidden");
+        overlay.classList.add("flex");
+        content.innerHTML = `<div class="text-center"><span class="text-4xl mb-2 block">⚠️</span><h3 class="text-xl font-bold mb-4">Signal Interference!</h3><p class="text-slate-400 mb-8">Stabilize Planet ${planet.name} frequency by recalling artifact data.</p><div class="grid grid-cols-1 gap-3"><button class="glass p-4 text-sm hover:bg-indigo-500/20 rounded-xl" onclick="stabilize('${planet.id}')">Recalibrate Sensors</button><button class="glass p-4 text-sm hover:bg-white/5 rounded-xl" onclick="closeModal()">Abort Mission</button></div></div>`;
+      }
+
+      function stabilize(id) {
+        state.unstablePlanets = state.unstablePlanets.filter((p) => p !== id);
+        state.fuel = Math.min(60, state.fuel + 1);
+        saveProgress();
+        closeModal();
+        renderMap();
+        updateUI();
+        showAlert("Frequency Stabilized! +1 Warp Fuel.");
+      }
+
+      function markAsUnstable(id) {
+        if (!state.unstablePlanets.includes(id)) {
+          state.unstablePlanets.push(id);
+          renderMap();
+        }
+      }
+
+      function checkStability() {
+        if (state.completedPlanets.length > 0 && Math.random() > 0.7)
+          markAsUnstable(
+            state.completedPlanets[
+              Math.floor(Math.random() * state.completedPlanets.length)
+            ],
+          );
+      }
+
+      function renderVault() {
+        const grid = document.getElementById("artifacts-grid");
+        grid.innerHTML = "";
+        const allVocab = [...new Set(DATA.planets.flatMap((p) => p.vocab))];
+
+        allVocab.forEach((v) => {
+          const discovered = state.discoveredVocab.includes(v);
+          const definition = VOCAB_DATA[v] || "Definition pending scanning...";
+          const card = document.createElement("div");
+          card.className = `artifact-card glass p-5 flex flex-col items-center gap-3 transition-all ${!discovered ? "opacity-20 grayscale cursor-not-allowed" : "hover:scale-105"}`;
+          card.innerHTML = `
+                    <div class="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-white/5">
+                        ${discovered ? "📦" : "❓"}
+                    </div>
+                    <div class="text-center space-y-1">
+                        <div class="text-sm font-mono font-bold tracking-wider text-blue-300">
+                            ${discovered ? v.toUpperCase() : "LOCKED ARTIFACT"}
+                        </div>
+                        ${discovered ? `<div class="text-[11px] leading-relaxed text-slate-300 italic px-2">"${definition}"</div>` : ""}
+                    </div>
+                    ${discovered ? `<button onclick="speak('${v}')" class="mt-2 w-full py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-[10px] text-emerald-400 uppercase font-mono hover:bg-emerald-500/20 transition-colors">▶ Play Audio</button>` : ""}
+                `;
+          grid.appendChild(card);
+        });
+
+        document.getElementById("vault-stats").innerText =
+          `${state.discoveredVocab.length} Artifacts Found`;
+        const badgeContainer = document.getElementById("badges-container");
+        badgeContainer.innerHTML = "";
+        if (state.fuel >= 15)
+          badgeContainer.innerHTML += `<span class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/50 rounded text-[10px] text-indigo-400 font-mono">INNER EXPLORER</span>`;
+        if (state.fuel >= 40)
+          badgeContainer.innerHTML += `<span class="px-2 py-1 bg-emerald-500/20 border border-emerald-500/50 rounded text-[10px] text-emerald-400 font-mono">WARP MASTER</span>`;
+        if (state.fuel >= 55)
+          badgeContainer.innerHTML += `<span class="px-2 py-1 bg-blue-500/20 border border-blue-500/50 rounded text-[10px] text-blue-400 font-mono">GALAXY LEGEND</span>`;
+      }
+
+      function updateUI() {
+        const maxCap = 60;
+        const fuelPerc = (state.fuel / maxCap) * 100;
+        document.getElementById("fuel-gauge").style.width = `${fuelPerc}%`;
+        document.getElementById("fuel-text").innerText =
+          `${state.fuel}/${maxCap}`;
+        document.getElementById("streak-count").innerText = state.streak;
+        const nextSystem = DATA.systems.find((s) => state.fuel < s.minFuel);
+        document.getElementById("status-msg").innerText = nextSystem
+          ? `System ${nextSystem.name} locked. Reach ${nextSystem.minFuel} Fuel to unlock.`
+          : "All systems operational. Deep space reached!";
+      }
+
+      function resetJumble() {
+        window.currentSelection = [];
+        const t = document.getElementById("jumble-target");
+        if (t) t.innerHTML = "";
+        document
+          .querySelectorAll(".word-chip")
+          .forEach((c) => c.classList.remove("used"));
+        const b = document.getElementById("check-btn");
+        if (b) b.classList.add("opacity-50", "cursor-not-allowed");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.add("hidden");
+        document.getElementById("modal-overlay").classList.remove("flex");
+        resetJumble();
+      }
+      function showAlert(msg) {
+        const a = document.getElementById("custom-alert");
+        document.getElementById("alert-text").innerText = msg;
+        a.classList.remove("hidden");
+        setTimeout(() => a.classList.add("hidden"), 4000);
+      }
+      function hideAlert() {
+        document.getElementById("custom-alert").classList.add("hidden");
+      }
+      function speak(text) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "en-US";
+        speechSynthesis.speak(u);
+      }
+      function saveProgress() {
+        localStorage.setItem("englishLab_GalaxyFuel_v4", JSON.stringify(state));
+      }
+      function loadProgress() {
+        const saved = localStorage.getItem("englishLab_GalaxyFuel_v4");
+        if (saved) Object.assign(state, JSON.parse(saved));
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

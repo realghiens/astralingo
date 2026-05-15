@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstraLingo: Galactic Riddle v2</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --glass: rgba(15, 23, 42, 0.8);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --emerald: #10b981;
+        --emerald-glow: rgba(16, 185, 129, 0.4);
+        --amber: #fbbf24;
+        --amber-glow: rgba(251, 191, 36, 0.4);
+        --blue-glow: rgba(59, 130, 246, 0.5);
+        --fusion-blue: #3b82f6;
+      }
+
+      body {
+        font-family: "Exo 2", sans-serif;
+        background: radial-gradient(
+          circle at top right,
+          #1e293b,
+          #0f172a,
+          #020617
+        );
+        color: #f8fafc;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .stars {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: transparent
+          url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png")
+          repeat;
+        animation: move-stars 200s linear infinite;
+      }
+
+      @keyframes move-stars {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: -10000px 5000px;
+        }
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+      }
+
+      /* AstraLingo Navbar Styling */
+      .nav-blur {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .glass-panel-nav {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 220px;
+        margin-top: 10px;
+        z-index: 100;
+        animation: slideDown 0.3s ease-out forwards;
+      }
+
+      .dropdown-content.active {
+        display: block;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Sub-nav Styling */
+      .sub-nav {
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Warp Fuel Gauge */
+      .fuel-container {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .fuel-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        transition: width 0.5s ease;
+        box-shadow: 0 0 10px var(--amber-glow);
+      }
+
+      .btn-galactic {
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        transition: all 0.3s;
+      }
+      .btn-galactic:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+      }
+
+      .option-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .option-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #6366f1;
+        transform: scale(1.02);
+      }
+
+      .page {
+        display: none;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        min-height: 100vh;
+      }
+      .page.active {
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.5s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .artifact-card {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        transition: all 0.3s;
+      }
+      .artifact-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 0 15px var(--blue-glow);
+      }
+
+      .correct-anim {
+        animation: bounce 0.5s;
+        background: rgba(16, 185, 129, 0.2) !important;
+        border-color: var(--emerald) !important;
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      #startup-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.9);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+      }
+
+      #game-btn {
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars"></div>
+
+    <!-- Main Unified AstraLingo Navigation -->
+    <nav class="fixed top-0 w-full z-50 nav-blur px-6 py-4">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Brand Logo -->
+        <a
+          href="index.html"
+          class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          <span class="text-3xl">🚀</span>
+          <h1
+            class="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+          >
+            AstraLingo
+          </h1>
+        </a>
+
+        <!-- Menu Links -->
+        <div
+          class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-200"
+        >
+          <a href="index.html" class="hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a href="handbook.html" class="hover:text-blue-400 transition-colors"
+            >Grammar</a
+          >
+
+          <!-- Dropdown Game -->
+          <div class="relative group">
+            <button
+              id="game-btn"
+              onclick="toggleNavbarDropdown(event)"
+              class="flex items-center gap-1 hover:text-blue-400 transition-colors outline-none"
+            >
+              Game
+              <span id="game-arrow" class="transition-transform duration-300"
+                >▾</span
+              >
+            </button>
+            <div
+              id="game-dropdown"
+              class="dropdown-content glass-panel-nav p-2 shadow-2xl"
+            >
+              <a
+                href="mission.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🚀 Galaxy Exploration</a
+              >
+              <a
+                href="whereami.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🧩 Galactic Riddle</a
+              >
+              <a
+                href="phrasalverbs.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🧬 Phrasal Fusion</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Burger (Visual Only) -->
+        <div class="md:hidden text-2xl cursor-pointer text-slate-200">☰</div>
+      </div>
+    </nav>
+
+    <!-- Sub-nav for Mission Status & Warp Fuel -->
+    <div class="fixed top-[72px] left-0 w-full z-40 sub-nav px-6 py-2">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <span
+            class="text-[10px] font-mono text-blue-400 uppercase tracking-widest"
+            >Flight Status: Online</span
+          >
+          <div class="flex flex-col w-40">
+            <span class="text-[9px] text-amber-400 font-mono"
+              >WARP FUEL: <span id="fuel-count">0</span>/8</span
+            >
+            <div class="fuel-container">
+              <div id="fuel-bar" class="fuel-bar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <button
+            onclick="showPage('game-page')"
+            class="text-[10px] font-mono text-blue-300 hover:text-white uppercase tracking-tighter"
+          >
+            Current Mission
+          </button>
+          <button
+            onclick="showPage('vault-page')"
+            class="text-[10px] font-mono text-blue-300 hover:text-white uppercase tracking-tighter"
+          >
+            Vault
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Home Page -->
+    <div
+      id="home-page"
+      class="page active items-center justify-center text-center pt-40"
+    >
+      <div class="glass-panel p-12 max-w-md">
+        <h1
+          class="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500"
+        >
+          🧩 Galactic Riddle
+        </h1>
+        <p class="text-blue-200 mb-8 leading-relaxed">
+          Solve English riddles, collect ancient artifacts, and ignite the Warp
+          Drive to reach the Outer Rim!
+        </p>
+        <div class="flex flex-col gap-4">
+          <button
+            onclick="startGame()"
+            class="btn-galactic px-12 py-4 rounded-full font-bold text-lg"
+          >
+            START MISSION
+          </button>
+          <button
+            onclick="resetData()"
+            class="text-[10px] text-red-400/60 hover:text-red-400 uppercase tracking-widest font-mono mt-4 transition-colors"
+          >
+            / System Format (Reset Data)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Page -->
+    <div id="game-page" class="page pt-44">
+      <div class="flex justify-between items-center mb-4">
+        <div
+          class="bg-emerald-500/20 border border-emerald-500 text-emerald-400 px-3 py-1 rounded text-sm font-mono"
+        >
+          SCORE: <span id="current-score">0</span>
+        </div>
+        <div class="text-blue-400 text-sm font-mono" id="system-tag">
+          SYSTEM: INNER CORE (A1)
+        </div>
+      </div>
+
+      <div class="glass-panel p-6 mb-6">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-white mb-1">
+            Puzzle Location #<span id="level-num">1</span>
+          </h2>
+          <div id="progress-dots" class="flex justify-center gap-1 mb-4"></div>
+        </div>
+
+        <div id="clue-container" class="space-y-3 mb-8"></div>
+
+        <div class="flex justify-center mb-6">
+          <button
+            id="next-clue-btn"
+            onclick="showNextClue()"
+            class="text-xs px-4 py-2 border border-blue-500/30 rounded-full text-blue-300 hover:bg-blue-500/10"
+          >
+            + SHOW NEXT CLUE
+          </button>
+        </div>
+
+        <div id="options-grid" class="grid grid-cols-2 gap-3"></div>
+      </div>
+    </div>
+
+    <!-- Vocab Vault -->
+    <div id="vault-page" class="page pt-44">
+      <h2 class="text-3xl font-bold mb-2">Artifact Collection</h2>
+      <p class="text-blue-400 text-sm mb-8">
+        Every location you identify is stored here with its galactic definition.
+      </p>
+
+      <div id="vault-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Artifacts cards -->
+      </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div
+      id="alert-box"
+      class="fixed bottom-10 left-1/2 -translate-x-1/2 glass-panel px-6 py-3 hidden z-[100] border-l-4"
+    >
+      <p id="alert-text" class="font-bold"></p>
+    </div>
+
+    <!-- Startup Modal -->
+    <div id="startup-modal">
+      <div class="glass-panel p-10 max-w-sm text-center">
+        <h2 class="text-2xl font-bold mb-2">Symmetry Restored</h2>
+        <p class="text-blue-300 text-sm mb-8">
+          Previous flight logs detected. Would you like to resume your mission?
+        </p>
+        <div class="flex flex-col gap-3">
+          <button
+            onclick="closeStartup()"
+            class="btn-galactic py-3 rounded-xl font-bold"
+          >
+            RESUME MISSION
+          </button>
+          <button
+            onclick="resetData(false)"
+            class="bg-white/5 border border-white/10 hover:bg-white/10 py-3 rounded-xl text-sm transition-all"
+          >
+            START FRESH
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Logika Dropdown AstraLingo
+      function toggleNavbarDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById("game-dropdown");
+        const arrow = document.getElementById("game-arrow");
+
+        const isActive = dropdown.classList.contains("active");
+        dropdown.classList.toggle("active");
+
+        if (arrow) {
+          arrow.style.transform = isActive ? "rotate(0deg)" : "rotate(180deg)";
+        }
+      }
+
+      window.addEventListener("click", function (e) {
+        const dropdown = document.getElementById("game-dropdown");
+        const gameBtn = document.getElementById("game-btn");
+        const arrow = document.getElementById("game-arrow");
+
+        if (dropdown && dropdown.classList.contains("active")) {
+          if (!gameBtn.contains(e.target)) {
+            dropdown.classList.remove("active");
+            if (arrow) arrow.style.transform = "rotate(0deg)";
+          }
+        }
+      });
+
+      // Game Logic Data
+      const QUESTIONS = [
+        {
+          id: 1,
+          answer: "LIBRARY",
+          system: "A1",
+          clues: [
+            "This place is very quiet and peaceful.",
+            "You can borrow something here, but must return it.",
+            "This place is full of books and shelves.",
+          ],
+          meaning:
+            "Library: A quiet place for reading and borrowing books for study or research.",
+          example: "Shhh! You must stay quiet in the library.",
+          icon: "📚",
+          options: ["SCHOOL", "LIBRARY", "OFFICE", "SHOP"],
+        },
+        {
+          id: 2,
+          answer: "GROCERY STORE",
+          system: "A1",
+          clues: [
+            "People come here with a shopping list.",
+            "You use a trolley or a basket here.",
+            "A place to buy food, vegetables, and snacks.",
+          ],
+          meaning:
+            "Grocery Store: A shop that sells food and small items for the house.",
+          example: "I need to buy some milk and eggs at the grocery store.",
+          icon: "🛒",
+          options: ["BANK", "PARK", "GROCERY STORE", "CAFÉ"],
+        },
+        {
+          id: 3,
+          answer: "BANK",
+          system: "A1",
+          clues: [
+            "This place has a very strict security system.",
+            "There are ATM machines and big safes here.",
+            "A place where people save or take money.",
+          ],
+          meaning:
+            "Bank: An institution where you can safely keep or borrow money.",
+          example: "He went to the bank to deposit his monthly salary.",
+          icon: "🏦",
+          options: ["BANK", "MUSEUM", "POST OFFICE", "POOL"],
+        },
+        {
+          id: 4,
+          answer: "HARDWARE STORE",
+          system: "A1",
+          clues: [
+            "Adults go here when they want to fix something.",
+            "This place smells like iron, wood, or paint.",
+            "You can buy hammers, nails, and screwdrivers here.",
+          ],
+          meaning:
+            "Hardware Store: A shop where you buy tools and equipment for your home.",
+          example: "I bought a new screwdriver at the hardware store.",
+          icon: "🛠️",
+          options: ["HARDWARE STORE", "ZOO", "BEACH", "PARK"],
+        },
+        {
+          id: 5,
+          answer: "PARK",
+          system: "A2",
+          clues: [
+            "An open space full of green areas.",
+            "Many people bring their pets for a walk here.",
+            "You can play on slides, swings, or have a picnic.",
+          ],
+          meaning: "Park: A large public garden or area used for recreation.",
+          example: "Children love playing on the slides at the local park.",
+          icon: "🌳",
+          options: ["FOREST", "PARK", "GARDEN", "BEACH"],
+        },
+        {
+          id: 6,
+          answer: "MUSEUM",
+          system: "A2",
+          clues: [
+            "You are not allowed to touch most things here.",
+            "This place keeps objects from the past.",
+            "You can see dinosaur fossils or ancient paintings.",
+          ],
+          meaning:
+            "Museum: A building where objects of historical or artistic interest are kept.",
+          example: "The history museum has a massive dinosaur skeleton.",
+          icon: "🖼️",
+          options: ["LIBRARY", "MUSEUM", "SCHOOL", "BANK"],
+        },
+        {
+          id: 7,
+          answer: "POST OFFICE",
+          system: "A2",
+          clues: [
+            "This place is identical with a specific logo color.",
+            "You need stamps or tracking numbers here.",
+            "A place to send letters, cards, or packages.",
+          ],
+          meaning:
+            "Post Office: An establishment where letters and parcels are processed and stamps are sold.",
+          example: "I need to send this letter at the post office.",
+          icon: "📮",
+          options: ["OFFICE", "POST OFFICE", "MALL", "POLICE"],
+        },
+        {
+          id: 8,
+          answer: "CAFÉ",
+          system: "A2",
+          clues: [
+            "People use this place to chat or work with laptops.",
+            "The smell of coffee beans is very strong here.",
+            "A place to buy coffee, tea, and pastries.",
+          ],
+          meaning:
+            "Café: A small restaurant where you can buy drinks and light meals.",
+          example: "Let's meet at the café for a cup of coffee.",
+          icon: "☕",
+          options: ["KITCHEN", "CAFÉ", "BAKERY", "CLUB"],
+        },
+        {
+          id: 9,
+          answer: "BEACH",
+          system: "B1",
+          clues: [
+            "You should wear sunscreen to avoid getting burned.",
+            "You can hear the sound of waves and strong wind.",
+            "A place full of sand, shells, and sea water.",
+          ],
+          meaning:
+            "Beach: A sandy area by the sea, often visited during holidays.",
+          example: "We built a giant sandcastle on the beach.",
+          icon: "🏖️",
+          options: ["POOL", "BEACH", "RIVER", "LAKE"],
+        },
+        {
+          id: 10,
+          answer: "POOL",
+          system: "B1",
+          clues: [
+            "You must shower before and after entering here.",
+            "The floor around this place is usually very slippery.",
+            "A man-made place used specifically for swimming.",
+          ],
+          meaning: "Swimming Pool: An artificial area of water for swimming.",
+          example: "The water in the pool is very cold today.",
+          icon: "🏊",
+          options: ["SEA", "POOL", "BATH", "RAIN"],
+        },
+        {
+          id: 11,
+          answer: "FARMER'S MARKET",
+          system: "B1",
+          clues: [
+            "Usually only open in the morning or weekends.",
+            "The sellers are people who grow the products.",
+            "A place to buy very fresh vegetables directly from farmers.",
+          ],
+          meaning:
+            "Farmer's Market: A food market where local farmers sell fruit and vegetables directly.",
+          example:
+            "I buy fresh strawberries at the farmer's market every Sunday.",
+          icon: "👨‍🌾",
+          options: ["SUPERMARKET", "FARMER'S MARKET", "MALL", "GARDEN"],
+        },
+        {
+          id: 12,
+          answer: "ZOO",
+          system: "B1",
+          clues: [
+            "You will walk a long way to see the whole place.",
+            "There are many large cages and keepers feeding animals.",
+            "A place where you can see lions, elephants, and giraffes.",
+          ],
+          meaning:
+            "Zoo: A park where many kinds of wild animals are kept so people can look at them.",
+          example: "We saw a family of tigers at the zoo.",
+          icon: "🦁",
+          options: ["FARM", "ZOO", "JUNGLE", "PET SHOP"],
+        },
+      ];
+
+      let state = {
+        score: 0,
+        level: 0,
+        fuel: 0,
+        clueIdx: 0,
+        discovered: [],
+        isB1Unlocked: false,
+      };
+
+      const STORAGE_KEY = "astralingo_riddle_v4";
+
+      window.onload = () => {
+        showPage("home-page");
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          document.getElementById("startup-modal").style.display = "flex";
+          loadState();
+        } else {
+          updateFuelUI();
+        }
+        renderVault();
+      };
+
+      function closeStartup() {
+        document.getElementById("startup-modal").style.display = "none";
+      }
+
+      function startGame() {
+        showPage("game-page");
+        loadQuestion();
+      }
+
+      function showPage(id) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        if (id === "vault-page") renderVault();
+      }
+
+      function loadQuestion() {
+        if (state.level >= QUESTIONS.length) {
+          endGame();
+          return;
+        }
+
+        const q = QUESTIONS[state.level];
+        state.clueIdx = 0;
+
+        if (q.system === "B1" && state.fuel < 8) {
+          showAlert("WARP DRIVE OFFLINE! 8 Fuel required.", false);
+          state.level = 0;
+          showPage("home-page");
+          return;
+        }
+
+        document.getElementById("level-num").innerText = state.level + 1;
+        document.getElementById("system-tag").innerText =
+          `SYSTEM: ${q.system === "A1" ? "INNER CORE" : q.system === "A2" ? "TRADE BELT" : "OUTER RIM"}`;
+        document.getElementById("next-clue-btn").style.display = "block";
+
+        const clueContainer = document.getElementById("clue-container");
+        clueContainer.innerHTML = `<div class="p-4 rounded-xl bg-white/5 border border-white/10 text-blue-100 flex gap-3 animate-pulse">
+                <span class="text-blue-500 font-mono">01.</span><span>${q.clues[0]}</span>
+            </div>`;
+
+        const grid = document.getElementById("options-grid");
+        grid.innerHTML = "";
+        const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+        shuffled.forEach((opt) => {
+          const card = document.createElement("div");
+          card.className = "option-card p-4 rounded-xl text-center font-bold";
+          card.innerText = opt;
+          card.onclick = () => checkAnswer(opt, card);
+          grid.appendChild(card);
+        });
+
+        renderProgress();
+      }
+
+      function showNextClue() {
+        if (state.clueIdx < 2) {
+          state.clueIdx++;
+          const q = QUESTIONS[state.level];
+          const clueContainer = document.getElementById("clue-container");
+          const div = document.createElement("div");
+          div.className =
+            "p-4 rounded-xl bg-white/5 border border-white/10 text-blue-100 flex gap-3";
+          div.innerHTML = `<span class="text-blue-500 font-mono">0${state.clueIdx + 1}.</span><span>${q.clues[state.clueIdx]}</span>`;
+          clueContainer.appendChild(div);
+
+          if (state.clueIdx === 2)
+            document.getElementById("next-clue-btn").style.display = "none";
+        }
+      }
+
+      function checkAnswer(ans, el) {
+        const q = QUESTIONS[state.level];
+        if (ans === q.answer) {
+          el.classList.add("correct-anim");
+          const points = (3 - state.clueIdx) * 10;
+          state.score += points;
+          state.fuel += 1;
+
+          if (!state.discovered.includes(q.id)) state.discovered.push(q.id);
+
+          document.getElementById("current-score").innerText = state.score;
+          updateFuelUI();
+          showAlert(`CORRECT! +${points} Score.`, true);
+
+          setTimeout(() => {
+            state.level++;
+            loadQuestion();
+            saveState();
+          }, 1500);
+        } else {
+          el.style.borderColor = "#f87171";
+          el.style.color = "#f87171";
+          showAlert("Wrong Answer! Check the clues.", false);
+        }
+      }
+
+      function updateFuelUI() {
+        const fuelNeeded = 8;
+        const count = Math.min(state.fuel, fuelNeeded);
+        const percent = (count / fuelNeeded) * 100;
+        document.getElementById("fuel-count").innerText = state.fuel;
+        document.getElementById("fuel-bar").style.width = percent + "%";
+
+        if (state.fuel >= fuelNeeded) {
+          document.getElementById("fuel-bar").style.background =
+            "linear-gradient(90deg, #10b981, #34d399)";
+        } else {
+          document.getElementById("fuel-bar").style.background =
+            "linear-gradient(90deg, #f59e0b, #fbbf24)";
+        }
+      }
+
+      function renderVault() {
+        const grid = document.getElementById("vault-grid");
+        grid.innerHTML = "";
+
+        QUESTIONS.forEach((q) => {
+          const isFound = state.discovered.includes(q.id);
+          const card = document.createElement("div");
+          card.className = `artifact-card flex gap-4 items-start ${!isFound ? "opacity-30" : ""}`;
+
+          if (isFound) {
+            const safeAnswer = q.answer.replace(/'/g, "&apos;");
+            card.innerHTML = `
+                        <div class="text-4xl bg-blue-500/10 p-4 rounded-2xl flex-shrink-0">${q.icon}</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="font-bold text-white text-xl">${q.answer}</h4>
+                                <button onclick="handleSpeakClick(this)" data-word="${safeAnswer}" class="text-blue-400 hover:scale-110 text-xl">🔊</button>
+                            </div>
+                            <p class="text-blue-300 text-sm font-medium mb-2">${q.meaning}</p>
+                            <div class="bg-white/5 p-3 rounded-lg border border-white/5">
+                                <p class="text-slate-400 text-xs italic">Example: "${q.example}"</p>
+                            </div>
+                        </div>
+                    `;
+          } else {
+            card.innerHTML = `
+                        <div class="text-4xl bg-slate-800 p-4 rounded-2xl opacity-50">❓</div>
+                        <div class="flex-1 pt-2">
+                            <h4 class="font-bold text-slate-500 text-lg">Locked Artifact</h4>
+                            <p class="text-slate-600 text-xs">Complete missions to identify this location.</p>
+                        </div>
+                    `;
+          }
+          grid.appendChild(card);
+        });
+      }
+
+      function handleSpeakClick(button) {
+        const word = button.getAttribute("data-word");
+        speak(word);
+      }
+
+      function speak(text) {
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          const msg = new SpeechSynthesisUtterance();
+          msg.text = text;
+          msg.lang = "en-US";
+          msg.rate = 0.9;
+          window.speechSynthesis.speak(msg);
+        }
+      }
+
+      function showAlert(txt, success) {
+        const box = document.getElementById("alert-box");
+        box.style.borderColor = success ? "#10b981" : "#f87171";
+        const textEl = document.getElementById("alert-text");
+        textEl.innerText = txt;
+        textEl.style.color = success ? "#34d399" : "#f87171";
+        box.classList.remove("hidden");
+        setTimeout(() => box.classList.add("hidden"), 2000);
+      }
+
+      function renderProgress() {
+        const container = document.getElementById("progress-dots");
+        container.innerHTML = "";
+        QUESTIONS.forEach((_, i) => {
+          const dot = document.createElement("div");
+          dot.className = `w-2 h-2 rounded-full ${i === state.level ? "bg-blue-400 scale-125" : i < state.level ? "bg-emerald-500" : "bg-white/10"}`;
+          container.appendChild(dot);
+        });
+      }
+
+      function endGame() {
+        showAlert("MISSION COMPLETE! 🚀", true);
+        showPage("vault-page");
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function loadState() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            state = { ...state, ...data };
+            document.getElementById("current-score").innerText = state.score;
+            updateFuelUI();
+          } catch (e) {
+            console.error("Error loading state", e);
+          }
+        }
+      }
+
+      function resetData(ask = true) {
+        if (
+          !ask ||
+          confirm("This will erase all mission logs and artifacts. Proceed?")
+        ) {
+          localStorage.removeItem(STORAGE_KEY);
+          location.reload();
+        }
+      }
+    </script>
+  </body>
+</html>
