@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstraLingo - Nebula Story Weaver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --glass: rgba(15, 23, 42, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --fusion-blue: #3b82f6;
+        --fusion-indigo: #6366f1;
+        --emerald: #10b981;
+        --crimson: #ef4444;
+      }
+
+      body {
+        background: radial-gradient(
+          circle at top right,
+          #1e293b,
+          #0f172a,
+          #020617
+        );
+        color: #f8fafc;
+        font-family: "Exo 2", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .glass-panel {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+      }
+
+      .glass-panel-mobile {
+        background: var(--glass);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .nebula-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("https://www.transparenttextures.com/patterns/stardust.png");
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .shimmer {
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.05),
+          transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -200% 0;
+        }
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      .loader {
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top: 3px solid var(--fusion-blue);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .nav-blur {
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      #mobile-menu {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(-100%);
+      }
+
+      #mobile-menu.open {
+        transform: translateY(0);
+      }
+
+      .safe-area-pt {
+        padding-top: env(safe-area-inset-top, 5rem);
+      }
+
+      /* Dropdown Desktop Animation */
+      .dropdown-content {
+        display: none;
+        animation: slideDown 0.2s ease-out forwards;
+      }
+      .dropdown-content.active {
+        display: block;
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="pt-24 pb-12 px-4 md:px-8">
+    <div class="nebula-bg"></div>
+
+    <!-- Navigation Bar -->
+    <header class="fixed top-0 left-0 w-full z-[100] nav-blur">
+      <nav
+        class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between"
+      >
+        <!-- Brand -->
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="text-2xl">🚀</span>
+          <h1
+            class="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+          >
+            AstraLingo
+          </h1>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div
+          class="hidden md:flex items-center gap-8 font-semibold text-slate-300"
+        >
+          <a href="index.html" class="hover:text-white transition-colors"
+            >Home</a
+          >
+          <a href="handbook.html" class="hover:text-white transition-colors"
+            >Grammar</a
+          >
+          <div class="relative">
+            <button
+              onclick="toggleDesktopDropdown(event)"
+              class="flex items-center gap-2 hover:text-white transition-colors focus:outline-none"
+            >
+              Games
+              <span id="game-arrow" class="text-[10px] transition-transform"
+                >▼</span
+              >
+            </button>
+            <!-- Desktop Dropdown Content -->
+            <div
+              id="game-dropdown"
+              class="dropdown-content absolute top-full right-0 mt-4 w-56 glass-panel p-2 shadow-2xl"
+            >
+              <a
+                href="mission.html"
+                class="block px-4 py-3 text-sm hover:bg-white/5 rounded-xl transition-colors"
+                >🚀 Galaxy Exploration</a
+              >
+              <a
+                href="whereami.html"
+                class="block px-4 py-3 text-sm hover:bg-white/5 rounded-xl transition-colors"
+                >🧩 Galactic Riddle</a
+              >
+              <a
+                href="phrasalverbs.html"
+                class="block px-4 py-3 text-sm hover:bg-white/5 rounded-xl transition-colors"
+                >🧬 Phrasal Fusion</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Hamburger Toggle -->
+        <div class="md:hidden">
+          <button
+            id="hamburger-btn"
+            onclick="toggleMobileMenu()"
+            class="text-2xl text-white focus:outline-none p-2"
+          >
+            <span id="menu-icon">☰</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- MOBILE MENU OVERLAY -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-[90] glass-panel-mobile flex flex-col p-8 safe-area-pt space-y-8 md:hidden"
+    >
+      <div class="flex flex-col space-y-6 text-xl font-bold">
+        <a
+          href="#"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4 hover:text-blue-400"
+          >Home</a
+        >
+        <a
+          href="#"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4 hover:text-blue-400"
+          >Handbook</a
+        >
+
+        <div class="space-y-4 pt-2">
+          <p class="text-xs font-mono text-blue-400 uppercase tracking-widest">
+            Training Modules
+          </p>
+          <a
+            href="#"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🚀 Galaxy Exploration</a
+          >
+          <a
+            href="#"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧩 Galactic Riddle</a
+          >
+          <a
+            href="#"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧬 Phrasal Fusion</a
+          >
+        </div>
+      </div>
+      <div class="mt-auto text-center border-t border-white/5 pt-6">
+        <p
+          class="text-[10px] text-slate-500 font-mono tracking-widest uppercase"
+        >
+          AstraLingo Navigation System
+        </p>
+      </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto space-y-8">
+      <div class="text-center space-y-2">
+        <h2 class="text-4xl font-bold tracking-tight text-white">
+          🌌 Nebula Story Weaver
+        </h2>
+        <p class="text-slate-400">
+          Tantangan Menulis Aktif: Susun cerita galaksi Anda dan biarkan AI
+          mengkalibrasinya.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Panel: Word Injector & Settings -->
+        <div class="lg:col-span-1 space-y-6">
+          <div class="glass-panel p-6 space-y-6">
+            <div>
+              <label
+                class="text-xs font-mono text-indigo-400 uppercase tracking-widest block mb-3"
+                >Tense Target</label
+              >
+              <select
+                id="tense-select"
+                class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-fusion-blue outline-none transition-all"
+              >
+                <option value="Past Simple">Past Simple (Misi Lampau)</option>
+                <option value="Present Simple">
+                  Present Simple (Rutinitas Kapal)
+                </option>
+                <option value="Present Perfect">
+                  Present Perfect (Pengalaman Misi)
+                </option>
+                <option value="Future Simple">
+                  Future Simple (Rencana Koloni)
+                </option>
+              </select>
+            </div>
+
+            <div class="pt-4 border-t border-white/5">
+              <div class="flex justify-between items-center mb-4">
+                <label
+                  class="text-xs font-mono text-emerald-400 uppercase tracking-widest"
+                  >Required Keywords</label
+                >
+                <button
+                  onclick="generateNewWords()"
+                  class="text-[10px] bg-white/5 hover:bg-white/10 px-2 py-1 rounded border border-white/10 transition-colors"
+                >
+                  REFRESH WORDS
+                </button>
+              </div>
+
+              <div id="word-container" class="space-y-3">
+                <div
+                  class="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20"
+                >
+                  <span class="text-[10px] text-blue-400 block mb-1"
+                    >VERBS</span
+                  >
+                  <p id="verb-display" class="font-bold text-sm tracking-wide">
+                    Repair, Discover
+                  </p>
+                </div>
+                <div
+                  class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20"
+                >
+                  <span class="text-[10px] text-purple-400 block mb-1"
+                    >OBJECTS</span
+                  >
+                  <p
+                    id="object-display"
+                    class="font-bold text-sm tracking-wide"
+                  >
+                    Spaceship, Alien Artifact
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-panel p-6 shimmer">
+            <h4 class="text-sm font-bold mb-2 flex items-center gap-2">
+              💡 Lab Tip
+            </h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Gunakan urutan kejadian yang logis. AI akan memberikan skor lebih
+              tinggi jika Anda menggunakan kata sifat (*adjectives*) untuk
+              mendeskripsikan objek Anda.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Panel: Writing Terminal -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="glass-panel p-6 md:p-8 flex flex-col h-full">
+            <label
+              class="text-xs font-mono text-slate-400 uppercase tracking-widest mb-4"
+              >Transmission Terminal</label
+            >
+            <textarea
+              id="story-input"
+              class="flex-grow min-h-[300px] bg-slate-950/40 border border-slate-800 rounded-2xl p-6 text-slate-200 placeholder-slate-600 focus:border-fusion-blue focus:outline-none transition-all text-lg leading-relaxed resize-none mb-6"
+              placeholder="Mulai ketik jurnal galaksi Anda di sini..."
+            ></textarea>
+
+            <button
+              id="transmit-btn"
+              onclick="transmitLog()"
+              class="w-full bg-gradient-to-r from-fusion-indigo to-fusion-blue hover:from-blue-500 hover:to-indigo-500 py-4 rounded-xl text-white font-bold tracking-widest transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-3"
+            >
+              <span id="btn-text">TRANSMIT & ANALYZE LOG</span>
+              <div id="btn-loader" class="loader hidden"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Section (Initially Hidden) -->
+      <div
+        id="result-section"
+        class="hidden space-y-8 animate-in fade-in duration-700"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Score Card -->
+          <div
+            class="glass-panel p-6 flex flex-col items-center justify-center text-center border-l-4 border-l-fusion-blue"
+          >
+            <span class="text-xs font-mono text-slate-400 uppercase mb-2"
+              >Mission Score</span
+            >
+            <div id="score-display" class="text-6xl font-black text-white">
+              85
+            </div>
+            <p
+              id="score-feedback"
+              class="text-sm text-blue-400 mt-2 font-semibold"
+            >
+              Great Flight, Pilot!
+            </p>
+          </div>
+
+          <!-- Grammar Report -->
+          <div class="md:col-span-2 glass-panel p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+              ❌ Grammar Calibration Report
+            </h3>
+            <div
+              id="grammar-list"
+              class="space-y-4 max-h-[250px] overflow-y-auto pr-2"
+            >
+              <!-- Items populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Corrected Version -->
+        <div
+          class="glass-panel p-8 bg-emerald-500/5 border border-emerald-500/20"
+        >
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-2xl">🚀</span>
+            <h3 class="text-xl font-bold text-emerald-400">
+              The Transmission Corrected (V2.0)
+            </h3>
+          </div>
+          <div
+            id="corrected-text"
+            class="text-lg leading-relaxed text-slate-200 italic font-light"
+          >
+            <!-- Text populated by JS -->
+          </div>
+          <div
+            class="mt-6 pt-6 border-t border-emerald-500/10 flex justify-end"
+          >
+            <button
+              onclick="startNextMission()"
+              class="text-xs font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-widest"
+            >
+              TRY NEXT MISSION →
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const apiKey = "AIzaSyArrt37TfsZaeSA_GzTq8UMuQ9WHTjZny0";
+      const model = "gemini-2.5-flash-preview-09-2025";
+
+      const verbList = [
+        "Repair",
+        "Discover",
+        "Inspect",
+        "Navigate",
+        "Calculate",
+        "Activate",
+        "Intercept",
+        "Scan",
+        "Construct",
+        "Analyze",
+        "Deploy",
+        "Establish",
+        "Monitor",
+      ];
+      const objectList = [
+        "Spaceship",
+        "Alien Artifact",
+        "Nebula Core",
+        "Warp Drive",
+        "Stellar Map",
+        "Oxygen Tank",
+        "Satellite",
+        "Cosmic Dust",
+        "Meteorite",
+        "Black Hole",
+        "Crystal Pod",
+        "Radio Signal",
+      ];
+
+      let currentVerbs = [];
+      let currentObjects = [];
+
+      // --- NAVIGATION LOGIC ---
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const icon = document.getElementById("menu-icon");
+        const isOpening = !menu.classList.contains("open");
+
+        menu.classList.toggle("open");
+        icon.innerText = isOpening ? "✕" : "☰";
+        document.body.style.overflow = isOpening ? "hidden" : "auto";
+      }
+
+      function toggleDesktopDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById("game-dropdown");
+        const arrow = document.getElementById("game-arrow");
+        dropdown.classList.toggle("active");
+        arrow.style.transform = dropdown.classList.contains("active")
+          ? "rotate(180deg)"
+          : "rotate(0deg)";
+      }
+
+      // Close dropdown when clicking outside
+      window.addEventListener("click", () => {
+        const dropdown = document.getElementById("game-dropdown");
+        const arrow = document.getElementById("game-arrow");
+        if (dropdown.classList.contains("active")) {
+          dropdown.classList.remove("active");
+          arrow.style.transform = "rotate(0deg)";
+        }
+      });
+
+      // --- GAME LOGIC ---
+      function generateNewWords() {
+        currentVerbs = [
+          verbList[Math.floor(Math.random() * verbList.length)],
+          verbList[Math.floor(Math.random() * verbList.length)],
+        ];
+        currentObjects = [
+          objectList[Math.floor(Math.random() * objectList.length)],
+          objectList[Math.floor(Math.random() * objectList.length)],
+        ];
+
+        if (currentVerbs[0] === currentVerbs[1])
+          currentVerbs[1] =
+            verbList[(verbList.indexOf(currentVerbs[0]) + 1) % verbList.length];
+        if (currentObjects[0] === currentObjects[1])
+          currentObjects[1] =
+            objectList[
+              (objectList.indexOf(currentObjects[0]) + 1) % objectList.length
+            ];
+
+        document.getElementById("verb-display").innerText =
+          currentVerbs.join(", ");
+        document.getElementById("object-display").innerText =
+          currentObjects.join(", ");
+
+        const container = document.getElementById("word-container");
+        container.style.opacity = "0";
+        setTimeout(() => (container.style.opacity = "1"), 200);
+      }
+
+      function startNextMission() {
+        document.getElementById("story-input").value = "";
+        document.getElementById("result-section").classList.add("hidden");
+        generateNewWords();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => {
+          document.getElementById("story-input").focus();
+        }, 600);
+      }
+
+      async function transmitLog() {
+        const story = document.getElementById("story-input").value.trim();
+        const tense = document.getElementById("tense-select").value;
+        const btn = document.getElementById("transmit-btn");
+        const btnText = document.getElementById("btn-text");
+        const btnLoader = document.getElementById("btn-loader");
+
+        if (!story || story.length < 20) {
+          alert(
+            "Tolong tulis narasi yang lebih panjang (minimal 1 paragraf) agar AI bisa menganalisis dengan baik.",
+          );
+          return;
+        }
+
+        btn.disabled = true;
+        btnText.innerText = "MENGANALISIS DATA...";
+        btnLoader.classList.remove("hidden");
+
+        const systemPrompt = `You are the AstraLingo Ship Computer AI. The user (Cadet) is practicing writing. 
+            Analyze their paragraph based on the target tense: "${tense}". 
+            Check if they used ini required keywords: ${currentVerbs.join(", ")}, ${currentObjects.join(", ")}.
+            
+            Respond STRICTLY in JSON format with these fields:
+            - score: (number 0-100)
+            - feedback_summary: (short Indonesian encouragement)
+            - corrections: (array of objects with {error: "wrong part", correction: "right part", explanation: "Indonesian explanation using English terms like 'Past Tense', 'Subject-Verb Agreement', etc."})
+            - corrected_version: (The full perfect English version of their story, beautifully written in sci-fi style)
+            
+            Keep the tone futuristic, motivating, and sharp.`;
+
+        try {
+          const response = await callGemini(story, systemPrompt);
+          const data = JSON.parse(response);
+          displayResults(data);
+        } catch (error) {
+          console.error(error);
+          alert("Sinyal terputus di nebula. Silakan coba lagi.");
+        } finally {
+          btn.disabled = false;
+          btnText.innerText = "TRANSMIT & ANALYZE LOG";
+          btnLoader.classList.add("hidden");
+        }
+      }
+
+      async function callGemini(userQuery, systemPrompt) {
+        const res = await fetch("http://localhost:3000/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            story: userQuery,
+            systemPrompt,
+          }),
+        });
+
+        const result = await res.json();
+
+        return result.candidates[0].content.parts[0].text;
+      }
+
+      function displayResults(data) {
+        const resultSection = document.getElementById("result-section");
+        const scoreDisplay = document.getElementById("score-display");
+        const scoreFeedback = document.getElementById("score-feedback");
+        const grammarList = document.getElementById("grammar-list");
+        const correctedText = document.getElementById("corrected-text");
+
+        resultSection.classList.remove("hidden");
+        grammarList.innerHTML = "";
+
+        scoreDisplay.innerText = data.score;
+        scoreFeedback.innerText = data.feedback_summary;
+
+        if (data.corrections.length === 0) {
+          grammarList.innerHTML = `<div class="p-4 rounded-xl bg-emerald-500/10 text-emerald-400 text-sm italic">Tidak ada kesalahan grammar yang terdeteksi. Kalibrasi sempurna, Cadet!</div>`;
+        } else {
+          data.corrections.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "p-4 rounded-xl bg-white/5 border border-white/10";
+            div.innerHTML = `
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-red-400 font-bold line-through text-xs">${item.error}</span>
+                            <span class="text-emerald-400 font-bold text-sm">→ ${item.correction}</span>
+                        </div>
+                        <p class="text-xs text-slate-400">${item.explanation}</p>
+                    `;
+            grammarList.appendChild(div);
+          });
+        }
+
+        correctedText.innerText = data.corrected_version;
+        resultSection.scrollIntoView({ behavior: "smooth" });
+      }
+
+      window.onload = generateNewWords;
+    </script>
+    <script>
+      // PENTING: Gunakan URL server lokal Anda
+      const SERVER_URL = "http://localhost:3000/analyze";
+
+      async function transmitLog() {
+        const story = document.getElementById("story-input").value.trim();
+        const tense = document.getElementById("tense-select").value;
+        const btn = document.getElementById("transmit-btn");
+        const btnText = document.getElementById("btn-text");
+        const btnLoader = document.getElementById("btn-loader");
+
+        if (!story || story.length < 10)
+          return alert("Tuliskan cerita yang lebih panjang!");
+
+        btn.disabled = true;
+        btnText.innerText = "CALIBRATING...";
+        btnLoader.classList.remove("hidden");
+
+        const systemPrompt = `You are a Ship AI. Analyze this "${tense}" paragraph. Required words: Repair, Discover, Spaceship, Artifact. Respond with JSON: {score: 0-100, feedback_summary: "", corrections: [{error: "", correction: "", explanation: ""}], corrected_version: ""}`;
+
+        try {
+          // KIRIM KE SERVER LOKAL, BUKAN GOOGLE LANGSUNG
+          const res = await fetch(SERVER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ story, systemPrompt }),
+          });
+
+          if (!res.ok) throw new Error("Server response failed");
+          const data = await res.json();
+
+          // Tampilkan hasil
+          document.getElementById("result-section").classList.remove("hidden");
+          document.getElementById("score-display").innerText = data.score;
+          document.getElementById("corrected-text").innerText =
+            data.corrected_version;
+
+          const gList = document.getElementById("grammar-list");
+          gList.innerHTML = data.corrections
+            .map(
+              (c) => `
+                    <div class="p-3 bg-white/5 rounded-lg border border-white/10">
+                        <span class="text-red-400 line-through text-xs">${c.error}</span>
+                        <span class="text-emerald-400 font-bold ml-2">→ ${c.correction}</span>
+                        <p class="text-[10px] text-slate-500 mt-1">${c.explanation}</p>
+                    </div>
+                `,
+            )
+            .join("");
+
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+          });
+        } catch (err) {
+          console.error(err);
+          alert(
+            "Gagal terhubung ke server. Pastikan server.js sudah jalan di terminal.",
+          );
+        } finally {
+          btn.disabled = false;
+          btnText.innerText = "TRANSMIT & ANALYZE LOG";
+          btnLoader.classList.add("hidden");
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>AstraLingo: Galactic Riddle v2</title>
     <!-- Google Fonts -->
     <link
@@ -34,6 +37,7 @@
         color: #f8fafc;
         min-height: 100vh;
         overflow-x: hidden;
+        touch-action: manipulation;
       }
 
       .stars {
@@ -63,6 +67,14 @@
         backdrop-filter: blur(12px);
         border: 1px solid var(--glass-border);
         border-radius: 24px;
+      }
+
+      /* Premium Glassmorphism for Mobile Sidebar Overlay */
+      .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       /* AstraLingo Navbar Styling */
@@ -104,6 +116,16 @@
           opacity: 1;
           transform: translateY(0);
         }
+      }
+
+      /* Mobile Menu Slide Animation Transition */
+      #mobile-menu {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(-100%);
+      }
+
+      #mobile-menu.open {
+        transform: translateY(0);
       }
 
       /* Sub-nav Styling */
@@ -218,7 +240,7 @@
     <div class="stars"></div>
 
     <!-- Main Unified AstraLingo Navigation -->
-    <nav class="fixed top-0 w-full z-50 nav-blur px-6 py-4">
+    <nav class="fixed top-0 w-full z-[100] nav-blur px-6 py-4">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <!-- Brand Logo -->
         <a
@@ -233,14 +255,14 @@
           </h1>
         </a>
 
-        <!-- Menu Links -->
+        <!-- Menu Links (Desktop Navigation) -->
         <div
           class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-200"
         >
           <a href="index.html" class="hover:text-blue-400 transition-colors"
             >Home</a
           >
-          <a href="handbook.html" class="hover:text-blue-400 transition-colors"
+          <a href="grammar.html" class="hover:text-blue-400 transition-colors"
             >Grammar</a
           >
 
@@ -261,13 +283,13 @@
               class="dropdown-content glass-panel-nav p-2 shadow-2xl"
             >
               <a
-                href="mission.html"
+                href="mission1.html"
                 class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
                 >🚀 Galaxy Exploration</a
               >
               <a
                 href="whereami.html"
-                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-blue-400 font-bold"
                 >🧩 Galactic Riddle</a
               >
               <a
@@ -279,10 +301,67 @@
           </div>
         </div>
 
-        <!-- Mobile Burger (Visual Only) -->
-        <div class="md:hidden text-2xl cursor-pointer text-slate-200">☰</div>
+        <!-- Hamburger Button (Only visible on Mobile Phones) -->
+        <div class="md:hidden">
+          <button
+            id="hamburger-btn"
+            onclick="toggleMobileMenu()"
+            class="text-2xl text-slate-100 focus:outline-none transition-transform active:scale-90 z-[110] relative flex items-center justify-center"
+          >
+            <span id="menu-icon">☰</span>
+          </button>
+        </div>
       </div>
     </nav>
+
+    <!-- Mobile Menu Overlay (Only active/visible on Mobile Phones) -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-[90] glass-card rounded-none flex flex-col p-8 pt-24 space-y-8 md:hidden"
+    >
+      <div class="flex flex-col space-y-6 text-xl font-bold">
+        <a
+          href="index.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Home</a
+        >
+        <a
+          href="grammar.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Grammar</a
+        >
+        <div class="space-y-4 pt-2">
+          <p class="text-xs font-mono text-blue-400 uppercase tracking-widest">
+            Training Modules
+          </p>
+          <a
+            href="mission1.html"
+            onclick="toggleMobileMenu()"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🚀 Galaxy Exploration</a
+          >
+          <a
+            href="whereami.html"
+            onclick="toggleMobileMenu()"
+            class="flex items-center gap-3 text-lg font-medium text-blue-400"
+            >🧩 Galactic Riddle</a
+          >
+          <a
+            href="phrasalverbs.html"
+            onclick="toggleMobileMenu()"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧬 Phrasal Fusion</a
+          >
+        </div>
+      </div>
+      <div class="mt-auto text-center">
+        <p class="text-[10px] text-slate-500 font-mono tracking-widest">
+          AstraLingo OS v2.0
+        </p>
+      </div>
+    </div>
 
     <!-- Sub-nav for Mission Status & Warp Fuel -->
     <div class="fixed top-[72px] left-0 w-full z-40 sub-nav px-6 py-2">
@@ -432,7 +511,20 @@
     </div>
 
     <script>
-      // Logika Dropdown AstraLingo
+      // Fungsi Toggle Menu Mobile Hamburger
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const icon = document.getElementById("menu-icon");
+        const isOpening = !menu.classList.contains("open");
+
+        menu.classList.toggle("open");
+        icon.innerText = isOpening ? "✕" : "☰";
+
+        // Kunci layar utama ketika menu mobile sedang terbuka
+        document.body.style.overflow = isOpening ? "hidden" : "auto";
+      }
+
+      // Logika Dropdown AstraLingo Desktop
       function toggleNavbarDropdown(e) {
         e.stopPropagation();
         const dropdown = document.getElementById("game-dropdown");
@@ -452,7 +544,7 @@
         const arrow = document.getElementById("game-arrow");
 
         if (dropdown && dropdown.classList.contains("active")) {
-          if (!gameBtn.contains(e.target)) {
+          if (gameBtn && !gameBtn.contains(e.target)) {
             dropdown.classList.remove("active");
             if (arrow) arrow.style.transform = "rotate(0deg)";
           }
@@ -674,6 +766,7 @@
         loadQuestion();
       }
 
+      // Penanganan perpindahan halaman dengan navigasi yang aman
       function showPage(id) {
         document
           .querySelectorAll(".page")

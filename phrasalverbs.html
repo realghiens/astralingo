@@ -1,8 +1,11 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>AstraLingo: Phrasal Fusion Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -24,15 +27,27 @@
         border-bottom: 1px solid var(--glass-border);
       }
 
-      /* Panel Glassmorphism untuk Dropdown */
-      .glass-panel-nav {
-        background: var(--glass);
-        backdrop-filter: blur(16px);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
+      body {
+        font-family: "Exo 2", sans-serif;
+        background: radial-gradient(circle at center, #0b1528 0%, #020617 100%);
+        overflow-x: hidden;
+        touch-action: manipulation;
       }
 
-      /* Logika Muncul/Hilang Dropdown */
+      .space-font {
+        font-family: "Space Mono", monospace;
+      }
+
+      /* Efek Glassmorphism Premium */
+      .glass-card {
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+
+      /* Dropdown Menu Desktop */
       .dropdown-content {
         display: none;
         position: absolute;
@@ -59,113 +74,99 @@
         }
       }
 
-      /* Mencegah seleksi teks pada tombol */
-      #game-btn {
-        user-select: none;
-      }
-    </style>
-    <style>
-      :root {
-        --glass: rgba(15, 23, 42, 0.85);
-        --glass-border: rgba(255, 255, 255, 0.15);
-        --emerald: #10b981;
-        --fusion-blue: #3b82f6;
-        --fusion-amber: #f59e0b;
+      /* Mobile Menu Styles */
+      #mobile-menu {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(-100%);
       }
 
-      body {
-        font-family: "Exo 2", sans-serif;
-        background: radial-gradient(circle at center, #1e293b 0%, #080c14 100%);
-        color: #e2e8f0;
-        min-height: 100vh;
-        overflow-x: hidden;
-        touch-action: manipulation;
+      #mobile-menu.open {
+        transform: translateY(0);
       }
 
-      .stars {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: url("https://www.transparenttextures.com/patterns/stardust.png");
-        pointer-events: none;
-        opacity: 0.3;
-        z-index: 0;
+      /* Latar Belakang Bintang Statis & Dinamis */
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        animation: pulseStar 3s infinite ease-in-out;
       }
 
-      .glass-panel {
-        background: var(--glass);
-        backdrop-filter: blur(16px);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-      }
-
-      .verb-core {
-        background: linear-gradient(135deg, #1e40af, #3b82f6);
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .prep-module {
-        background: linear-gradient(135deg, #92400e, #f59e0b);
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-        cursor: grab;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        user-select: none;
-        -webkit-user-drag: element;
-      }
-
-      .prep-module:active {
-        cursor: grabbing;
-      }
-
-      /* Mencegah ghosting masif saat drag */
-      .prep-module.dragging {
-        opacity: 0.5;
-        transform: scale(0.9);
-      }
-
-      .drop-zone.drag-over {
-        border: 2px solid var(--fusion-blue);
-        background: rgba(59, 130, 246, 0.15);
-        transform: scale(1.02);
-      }
-
-      .progress-fill {
-        transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-
-      @keyframes pulse-glow {
+      @keyframes pulseStar {
         0%,
         100% {
-          box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+          opacity: 0.3;
+          transform: scale(0.8);
         }
         50% {
-          box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+          opacity: 1;
+          transform: scale(1.2);
         }
       }
 
-      .active-core {
-        animation: pulse-glow 2s infinite;
+      /* Efek Melayang Halus */
+      .hover-float {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .hover-float:hover {
+        transform: translateY(-4px);
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
       }
 
-      .tab-btn.active {
-        background: var(--fusion-blue);
-        color: white;
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+      /* Animasi Pulse Energy untuk Click-to-Move Target */
+      .pulse-energy-active {
+        animation: pulseEnergy 1.5s infinite alternate;
+        border-color: #3b82f6 !important;
+        background: rgba(59, 130, 246, 0.15) !important;
+      }
+
+      @keyframes pulseEnergy {
+        0% {
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+        100% {
+          box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+        }
+      }
+
+      /* Gaya Tombol Preposisi Terpilih */
+      .prep-selected {
+        border-color: #3b82f6 !important;
+        background: rgba(59, 130, 246, 0.25) !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        transform: scale(1.05);
+      }
+
+      /* Tombol Sektor Aktif & Tidak Aktif */
+      .sector-btn-active {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        border-color: #3b82f6;
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+      }
+      .sector-btn-inactive {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(255, 255, 255, 0.05);
+        color: #94a3b8;
+      }
+      .sector-btn-inactive:hover {
+        background: rgba(30, 41, 59, 0.6);
+        color: #cbd5e1;
       }
     </style>
   </head>
-  <body class="p-4 md:p-8 flex flex-col items-center">
-    <div class="stars"></div>
+  <body class="min-h-screen text-slate-100 relative pb-12">
+    <!-- Starfield Background -->
+    <div
+      id="starfield"
+      class="absolute inset-0 pointer-events-none overflow-hidden z-0"
+    ></div>
 
-    <nav class="fixed top-0 w-full z-50 nav-blur px-6 py-4">
+    <!-- Navigation Bar -->
+    <nav class="nav-blur fixed top-0 left-0 w-full z-[100] px-6 py-4">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <!-- Brand Logo -->
+        <!-- Logo -->
         <a
           href="index.html"
           class="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -178,22 +179,18 @@
           </h1>
         </a>
 
-        <!-- Menu Links -->
-        <div
-          class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-200"
-        >
+        <!-- Desktop Links -->
+        <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
           <a href="index.html" class="hover:text-blue-400 transition-colors"
             >Home</a
           >
-          <a href="handbook.html" class="hover:text-blue-400 transition-colors"
+          <a href="grammar.html" class="hover:text-blue-400 transition-colors"
             >Grammar</a
           >
-
-          <!-- Dropdown Game -->
           <div class="relative group">
             <button
               id="game-btn"
-              onclick="toggleNavbarDropdown(event)"
+              onclick="toggleDropdown(event)"
               class="flex items-center gap-1 hover:text-blue-400 transition-colors outline-none"
             >
               Game
@@ -203,10 +200,10 @@
             </button>
             <div
               id="game-dropdown"
-              class="dropdown-content glass-panel-nav p-2 shadow-2xl"
+              class="dropdown-content glass-card p-2 shadow-2xl"
             >
               <a
-                href="mission.html"
+                href="mission1.html"
                 class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
                 >🚀 Galaxy Exploration</a
               >
@@ -217,616 +214,1366 @@
               >
               <a
                 href="phrasalverbs.html"
-                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors bg-blue-500/10 text-blue-400"
                 >🧬 Phrasal Fusion</a
               >
             </div>
           </div>
         </div>
 
-        <!-- Mobile Burger (Visual Only) -->
-        <div class="md:hidden text-2xl cursor-pointer text-slate-200">☰</div>
+        <!-- Mobile Toggle Button -->
+        <div class="md:hidden">
+          <button
+            id="hamburger-btn"
+            onclick="toggleMobileMenu()"
+            class="text-3xl focus:outline-none transition-transform active:scale-90"
+          >
+            <span id="menu-icon">☰</span>
+          </button>
+        </div>
       </div>
     </nav>
 
-    <!-- Header & Statistik -->
-    <header
-      class="relative z-10 w-full max-w-6xl flex flex-col md:flex-row justify-between items-center mb-8 gap-6"
-      style="margin-top: 80px"
+    <!-- Mobile Menu Overlay -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-[90] glass-card rounded-none flex flex-col p-8 pt-24 space-y-8 md:hidden"
     >
-      <div class="text-center md:text-left">
-        <h1
-          class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400"
+      <div class="flex flex-col space-y-6 text-xl font-bold">
+        <a
+          href="index.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Home</a
         >
-          PHRASAL FUSION PRO
+        <a
+          href="grammar.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Grammar</a
+        >
+        <div class="space-y-4 pt-2">
+          <p class="text-xs font-mono text-blue-400 uppercase tracking-widest">
+            Training Modules
+          </p>
+          <a
+            href="mission1.html"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🚀 Galaxy Exploration</a
+          >
+          <a
+            href="whereami.html"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧩 Galactic Riddle</a
+          >
+          <a
+            href="phrasalverbs.html"
+            class="flex items-center gap-3 text-lg font-medium text-blue-400"
+            >🧬 Phrasal Fusion</a
+          >
+        </div>
+      </div>
+      <div class="mt-auto text-center">
+        <p class="text-[10px] text-slate-500 font-mono tracking-widest">
+          AstraLingo OS v2.0
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 relative z-10">
+      <!-- Header Section -->
+      <div class="text-center mb-6">
+        <div
+          class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/30 px-4 py-1.5 rounded-full text-xs font-semibold text-blue-400 tracking-wider space-font uppercase mb-3 animate-pulse"
+        >
+          <span>🧬 FUSION REACTOR ONLINE</span>
+        </div>
+        <h1
+          class="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400"
+        >
+          Phrasal Fusion Pro
         </h1>
-        <p class="text-blue-300 font-mono text-xs tracking-widest uppercase">
-          AstraLingo: Advanced Research
+        <p class="text-slate-400 text-sm mt-1 max-w-xl mx-auto">
+          Combine base action verbs with the correct preposition modules inside
+          the fusion reactor to generate high-energy Phrasal Verbs!
         </p>
       </div>
 
-      <div class="glass-panel px-6 py-4 flex flex-col gap-2 min-w-[300px]">
-        <div class="flex justify-between text-xs font-mono uppercase">
-          <span class="text-blue-300">Discovery Progress</span>
-          <span id="score-text" class="text-emerald-400">0 / 43</span>
-        </div>
-        <div class="w-full bg-white/10 h-3 rounded-full overflow-hidden">
-          <div
-            id="progress-bar"
-            class="progress-fill h-full bg-gradient-to-r from-blue-500 to-emerald-500"
-            style="width: 0%"
-          ></div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Navigasi Level -->
-    <nav class="relative z-10 mb-8 flex gap-2">
-      <button
-        onclick="filterLevel('A2')"
-        id="btn-A2"
-        class="tab-btn active glass-panel px-6 py-2 text-sm font-bold transition-all"
-      >
-        LEVEL A2
-      </button>
-      <button
-        onclick="filterLevel('B1')"
-        id="btn-B1"
-        class="tab-btn glass-panel px-6 py-2 text-sm font-bold transition-all"
-      >
-        LEVEL B1
-      </button>
-    </nav>
-
-    <main
-      class="relative z-10 w-full max-w-6xl grid grid-cols-1 lg:grid-cols-4 gap-8"
-    >
-      <!-- Energy Cores -->
-      <div class="lg:col-span-3 glass-panel p-8">
-        <div class="flex items-center gap-3 mb-8">
-          <div class="w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
-          <h2 class="text-xl font-bold tracking-tight text-white uppercase">
-            Energy Cores
-            <span id="current-level-label" class="text-blue-400 text-sm ml-2"
-              >(A2 Elementary)</span
-            >
-          </h2>
-        </div>
+      <!-- Sector Level Selector Tabs -->
+      <div class="flex justify-center mb-8">
         <div
-          id="core-grid"
-          class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
-        ></div>
+          class="inline-flex p-1.5 bg-slate-950/80 rounded-2xl border border-slate-800/80 max-w-md w-full sm:w-auto"
+        >
+          <button
+            id="sector-a2-btn"
+            onclick="switchSector('A2')"
+            class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-bold space-font tracking-wider uppercase transition-all duration-300 sector-btn-active"
+          >
+            Sector A2 (Trade Belt)
+          </button>
+          <button
+            id="sector-b2-btn"
+            onclick="switchSector('B2')"
+            class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-bold space-font tracking-wider uppercase transition-all duration-300 sector-btn-inactive ml-1"
+          >
+            Sector B2 (Command Center)
+          </button>
+        </div>
       </div>
 
-      <!-- Prep Modules -->
-      <div class="space-y-6">
-        <div class="glass-panel p-6 sticky top-8">
-          <h2
-            class="text-sm font-bold text-amber-400 mb-6 flex items-center gap-2 uppercase tracking-widest"
-          >
-            Prep Modules
-          </h2>
-          <div id="prep-container" class="flex flex-wrap gap-2"></div>
+      <!-- Game Cockpit Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Sidebar Stats -->
+        <div class="lg:col-span-3 space-y-4">
+          <!-- Cadet Profile Status -->
+          <div class="glass-card rounded-2xl p-5 border-slate-800">
+            <h3
+              class="space-font text-xs text-blue-400 font-bold uppercase tracking-wider mb-4 flex items-center justify-between"
+            >
+              <span>CADET LOGBOOK</span>
+              <span
+                class="animate-ping w-2 h-2 rounded-full bg-emerald-500"
+              ></span>
+            </h3>
+            <div class="space-y-3.5">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400 text-xs">Astra Status:</span>
+                <span class="text-xs font-bold space-font text-emerald-400"
+                  >ACTIVE CADET</span
+                >
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400 text-xs">Active Sector:</span>
+                <span
+                  id="active-sector-indicator"
+                  class="text-xs font-bold space-font text-blue-300"
+                  >A2</span
+                >
+              </div>
+              <hr class="border-slate-800" />
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400 text-xs">Fuel Cells:</span>
+                <span
+                  id="fuel-count"
+                  class="text-xs font-bold space-font text-blue-400"
+                  >10 / 10 🚀</span
+                >
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-400 text-xs">Fusion Score:</span>
+                <span
+                  id="fusion-score"
+                  class="text-xs font-bold space-font text-amber-400"
+                  >0 Pts</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Instructions & Mobile Tip -->
           <div
-            class="mt-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl"
+            class="glass-card rounded-2xl p-5 border-slate-800 text-xs text-slate-400 leading-relaxed space-y-3"
           >
-            <p class="text-[10px] text-blue-300 uppercase font-mono mb-2">
-              Instruksi:
+            <p class="font-bold text-slate-300">📡 REACTOR PROTOCOLS:</p>
+            <p class="hidden md:block">
+              1. <strong>Drag</strong> one of the preposition modules at the
+              bottom.<br />
+              2. <strong>Drop</strong> it inside the
+              <em>Fusion Chamber Core</em> on the right.<br />
+              3. Successfully fusing the phrasal verb will unlock its secret
+              meaning!
             </p>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Tarik <span class="text-amber-400 font-bold">Module</span> ke arah
-              <span class="text-blue-400 font-bold">Energy Core</span> untuk
-              menemukan maknanya.
+            <p
+              class="block md:hidden text-amber-300/90 bg-amber-950/20 border border-amber-500/20 p-2.5 rounded-lg"
+            >
+              📱 <strong>Touchscreen Tip:</strong><br />
+              Tap once on a preposition module to select it, then tap the
+              <strong>Energy Core</strong> target to fuse it instantly and
+              seamlessly!
             </p>
+          </div>
+        </div>
+
+        <!-- Main Interactive Fusion Deck -->
+        <div class="lg:col-span-6 space-y-6">
+          <div
+            class="glass-card rounded-3xl p-6 relative overflow-hidden border-slate-800"
+          >
+            <!-- Reactor Status Indicator -->
+            <div class="flex justify-between items-center mb-6">
+              <div class="flex items-center space-x-2">
+                <div
+                  class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"
+                ></div>
+                <span
+                  class="space-font text-xs font-bold tracking-widest text-blue-400"
+                  >FUSION ZONE</span
+                >
+              </div>
+              <span id="current-stage" class="space-font text-xs text-slate-500"
+                >STAGE 1/15</span
+              >
+            </div>
+
+            <!-- Fusion Arena: Left (Verb) and Right (Energy Core Target) -->
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center my-8 relative"
+            >
+              <!-- Left Base Verb Container -->
+              <div
+                class="flex flex-col items-center justify-center p-6 rounded-2xl border border-slate-800 bg-slate-900/50"
+              >
+                <span
+                  class="text-xs text-slate-500 space-font mb-2 uppercase tracking-wider"
+                  >Base Action</span
+                >
+                <div
+                  id="base-verb"
+                  class="text-3xl font-extrabold tracking-wide text-white drop-shadow-md"
+                >
+                  LOOK
+                </div>
+                <span
+                  class="text-xs text-slate-400 italic mt-2 text-center"
+                  id="verb-indonesian-hint"
+                >
+                  (To look)
+                </span>
+              </div>
+
+              <!-- Connecting Energy Beam Link -->
+              <div
+                class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center z-10 pointer-events-none"
+              >
+                <span class="text-lg animate-pulse">⚡</span>
+              </div>
+
+              <!-- Right Fusion Chamber Target Zone -->
+              <div
+                id="fusion-chamber"
+                class="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-slate-700 hover:border-blue-500/50 bg-slate-950/80 transition-all duration-300 cursor-pointer min-h-[140px]"
+              >
+                <span
+                  class="text-xs text-slate-500 space-font mb-2 uppercase tracking-wider"
+                  >Fusion Chamber</span
+                >
+                <div
+                  id="chamber-core"
+                  class="text-center transition-all duration-300 pointer-events-none"
+                >
+                  <div
+                    class="text-3xl text-slate-600 animate-pulse font-extrabold tracking-wider"
+                  >
+                    ?
+                  </div>
+                  <span class="text-xs text-blue-400/80 space-font block mt-2"
+                    >TAP OR DROP HERE</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Clue/Hint Banner -->
+            <div
+              class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-center mb-6"
+            >
+              <span
+                class="text-xs space-font text-blue-400 block mb-1 uppercase tracking-wider"
+                >TARGET MEANING:</span
+              >
+              <p
+                id="target-definition"
+                class="text-slate-200 text-sm font-semibold"
+              >
+                "To search for something or someone."
+              </p>
+            </div>
+
+            <!-- Modular Preposition Banks -->
+            <div>
+              <span
+                class="text-xs text-slate-400 space-font block mb-3 uppercase tracking-wider text-center"
+                >Preposition Modules Available:</span
+              >
+              <div
+                id="prepositions-bank"
+                class="grid grid-cols-3 sm:grid-cols-4 gap-3"
+              >
+                <!-- Buttons/Cards generated via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Discovered Vocabulary Vault -->
+        <div class="lg:col-span-3 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border-slate-800">
+            <h3
+              class="space-font text-xs text-blue-400 font-bold uppercase tracking-wider mb-4 flex items-center justify-between"
+            >
+              <span>FUSION INDEX</span>
+              <span id="progress-percent" class="text-slate-500">0%</span>
+            </h3>
+            <div
+              class="relative w-full h-1.5 bg-slate-900 rounded-full overflow-hidden mb-4"
+            >
+              <div
+                id="progress-bar"
+                class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500"
+                style="width: 0%"
+              ></div>
+            </div>
+            <!-- Scrollable discovered lists -->
+            <div
+              id="discovered-list"
+              class="space-y-2 max-h-[290px] overflow-y-auto pr-1 text-xs text-slate-400"
+            >
+              <div class="text-center py-6 text-slate-500 italic">
+                No phrasal verbs fused in this sector yet.
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Modal Sukses -->
+    <!-- Interactive Artifact Detail Modal -->
     <div
       id="modal-overlay"
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-all duration-300"
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300"
     >
       <div
         id="modal-card"
-        class="glass-panel p-8 max-w-lg w-full mx-4 border-emerald-500/30 text-center transform scale-90 transition-transform duration-300"
+        class="glass-card max-w-md w-full rounded-3xl p-6 border-slate-700 transform scale-90 transition-transform duration-300"
       >
-        <div id="modal-emoji" class="text-7xl mb-4">🚀</div>
-        <h3
-          id="modal-title"
-          class="text-3xl font-bold text-white mb-1 uppercase tracking-tighter"
-        >
-          PHRASAL VERB
-        </h3>
-        <p
-          id="modal-level"
-          class="text-xs font-mono text-blue-400 mb-4 tracking-widest uppercase"
-        >
-          Data Acquired
-        </p>
-        <div
-          class="bg-slate-900/50 rounded-2xl p-6 mb-6 text-left border border-white/5"
-        >
-          <p class="text-xs text-slate-400 uppercase font-mono mb-1">
-            Makna (Meaning):
-          </p>
-          <p
-            id="modal-meaning"
-            class="text-lg text-emerald-300 mb-4 font-semibold leading-snug"
-          ></p>
-          <div class="border-l-2 border-blue-500 pl-4 py-1">
-            <p class="text-[10px] text-slate-500 uppercase font-mono mb-1">
-              Contoh Kalimat:
-            </p>
+        <div class="text-center mb-4">
+          <span class="text-4xl animate-bounce inline-block">🧬</span>
+          <h2
+            id="modal-phrasal"
+            class="text-2xl font-bold tracking-wide text-white space-font mt-2"
+          >
+            LOOK AFTER
+          </h2>
+          <span class="text-xs text-emerald-400 font-semibold space-font"
+            >FUSION SUCCESSFUL</span
+          >
+        </div>
+        <div class="space-y-4 my-6">
+          <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="text-xs text-slate-500 space-font block mb-1"
+              >Meaning (Indonesian)</span
+            >
             <p
-              id="modal-example"
-              class="text-sm text-slate-200 leading-relaxed italic"
-            ></p>
+              id="modal-translation"
+              class="text-slate-200 font-semibold text-sm"
+            >
+              Merawat / Menjaga
+            </p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="text-xs text-slate-500 space-font block mb-1"
+              >Usage Example</span
+            >
+            <p id="modal-example" class="text-slate-300 italic text-sm">
+              "I will look after your cat while you are in outer space."
+            </p>
           </div>
         </div>
         <button
           onclick="closeModal()"
-          class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-wide"
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold tracking-wider space-font text-sm transition-all shadow-lg hover:shadow-blue-500/20"
         >
-          Simpan ke Vault
+          CONTINUE MISSION 🚀
         </button>
       </div>
     </div>
+
+    <!-- 100% Congratulations Sector Complete Modal -->
+    <div
+      id="congrats-overlay"
+      class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300"
+    >
+      <div
+        id="congrats-card"
+        class="glass-card max-w-lg w-full rounded-3xl p-8 border-emerald-500/30 text-center transform scale-90 transition-transform duration-300 relative overflow-hidden"
+      >
+        <!-- Background Glowing Stars/Light Effect -->
+        <div
+          class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl"
+        ></div>
+
+        <div class="mb-6 relative">
+          <span class="text-6xl inline-block animate-bounce mb-2">🏆</span>
+          <div
+            class="text-2xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-300 space-font uppercase"
+          >
+            Sector 100% Decoded!
+          </div>
+          <div class="text-sm text-slate-400 space-font mt-1">
+            ASTRALINGO OPERATIONS OPERATIONAL
+          </div>
+        </div>
+
+        <h3 id="congrats-title" class="text-2xl font-bold text-white mb-3">
+          Congratulations, Elite Cadet!
+        </h3>
+        <p
+          id="congrats-message"
+          class="text-slate-300 text-sm leading-relaxed mb-6"
+        >
+          You have successfully completed all phrasal verb fusions in this
+          sector with perfect stability. Warp drive navigation is ready for
+          takeoff!
+        </p>
+
+        <div
+          class="grid grid-cols-2 gap-4 max-w-xs mx-auto mb-8 bg-slate-900/60 p-4 rounded-2xl border border-slate-800"
+        >
+          <div>
+            <div class="text-[10px] text-slate-500 space-font uppercase">
+              Total Score
+            </div>
+            <div
+              id="congrats-score"
+              class="text-xl font-bold text-amber-400 space-font"
+            >
+              0 Pts
+            </div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 space-font uppercase">
+              Completed Sector
+            </div>
+            <div
+              id="congrats-sector-name"
+              class="text-xl font-bold text-blue-400 space-font"
+            >
+              A2
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons Layout: Review, Reset, and Warp (Conditional) -->
+        <div class="flex flex-col gap-3">
+          <!-- Main CTA: Warp to next sector (Only visible when finishing A2) -->
+          <button
+            id="congrats-warp-btn"
+            onclick="warpToB2()"
+            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-400 hover:to-blue-500 text-white font-bold tracking-widest space-font text-xs transition-all shadow-xl hover:shadow-emerald-500/20 uppercase"
+          >
+            WARP TO SECTOR B2 (Command Center) 🌌
+          </button>
+
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              onclick="reviewVocabulary()"
+              class="w-full py-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-300 font-bold tracking-wider space-font text-xs transition-all uppercase"
+            >
+              🔍 Review Vocabulary
+            </button>
+            <button
+              onclick="resetAndPlayAgain()"
+              class="w-full py-3 rounded-xl bg-slate-850 hover:bg-slate-700 border border-slate-700 text-amber-400 font-bold tracking-wider space-font text-xs transition-all uppercase"
+            >
+              🔄 Restart Level (Reset)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script Game Logic & UI Interactions -->
     <script>
-      function toggleNavbarDropdown(e) {
-        // Mencegah event bubbling agar tidak langsung ditutup oleh window listener
+      // Desktop Nav Dropdown Toggle
+      function toggleDropdown(e) {
         e.stopPropagation();
         const dropdown = document.getElementById("game-dropdown");
         const arrow = document.getElementById("game-arrow");
-
         const isActive = dropdown.classList.contains("active");
 
-        // Tutup semua dropdown lain jika ada (opsional)
         dropdown.classList.toggle("active");
-
-        // Animasi rotasi panah
         if (arrow) {
           arrow.style.transform = isActive ? "rotate(0deg)" : "rotate(180deg)";
         }
       }
 
-      // Menutup dropdown otomatis jika user mengklik area lain di luar menu
+      // Mobile Menu Overlay Toggle
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const icon = document.getElementById("menu-icon");
+        const isOpening = !menu.classList.contains("open");
+
+        menu.classList.toggle("open");
+        icon.innerText = isOpening ? "✕" : "☰";
+
+        // Scroll lock saat mobile menu overlay terbuka
+        document.body.style.overflow = isOpening ? "hidden" : "auto";
+      }
+
+      // Tutup otomatis dropdown saat klik sembarang di luar menu
       window.addEventListener("click", function (e) {
         const dropdown = document.getElementById("game-dropdown");
         const gameBtn = document.getElementById("game-btn");
         const arrow = document.getElementById("game-arrow");
 
         if (dropdown && dropdown.classList.contains("active")) {
-          if (!gameBtn.contains(e.target)) {
+          if (gameBtn && !gameBtn.contains(e.target)) {
             dropdown.classList.remove("active");
             if (arrow) arrow.style.transform = "rotate(0deg)";
           }
         }
       });
-    </script>
-    <script>
-      const DATABASE = {
-        // --- LEVEL A2 ---
-        "A2-look-for": {
-          emoji: "🔍",
-          meaning:
-            "Mencari sesuatu atau seseorang yang hilang atau dibutuhkan.",
-          example: "I am looking for my keys. Have you seen them?",
+
+      // Database Phrasal Verbs: Sector A2 (15) & Sector B2 (10)
+      const STAGES = [
+        // --- SEKTOR A2 (Trade Belt) - 15 Soal ---
+        {
+          level: "A2",
+          verb: "TURN",
+          hint: "To turn",
+          target: "on",
+          definition: "To activate a machine, robot, or computer.",
+          indonesian: "Menyalakan (mesin pesawat, robot, atau komputer)",
+          example:
+            "Turn on the spaceship's engine! (Nyalakan mesin pesawat luar angkasanya!)",
         },
-        "A2-look-after": {
-          emoji: "👶",
-          meaning:
-            "Merawat, menjaga, atau bertanggung jawab atas seseorang/sesuatu.",
-          example: "Can you look after my cat while I am on vacation?",
+        {
+          level: "A2",
+          verb: "TURN",
+          hint: "To turn",
+          target: "off",
+          definition: "To deactivate a system, robot, or spaceship lights.",
+          indonesian: "Mematikan (sistem, robot, atau lampu pesawat)",
+          example:
+            "Please turn off the killer robot. (Tolong matikan robot pembunuh itu.)",
         },
-        "A2-look-up": {
-          emoji: "📖",
-          meaning:
-            "Mencari informasi spesifik di dalam buku referensi, kamus, atau internet.",
-          example: "You should look up the word in the dictionary.",
+        {
+          level: "A2",
+          verb: "LOG",
+          hint: "To log",
+          target: "in",
+          definition: "To gain access to a computer system or an account.",
+          indonesian: "Masuk ke dalam sistem komputer atau akun",
+          example:
+            "The scientist needs to log in to open the secret door. (Ilmuwan itu harus masuk ke sistem untuk membuka pintu rahasia.)",
         },
-        "A2-get-up": {
-          emoji: "⏰",
-          meaning: "Bangun dari tidur dan meninggalkan tempat tidur.",
-          example: "I usually get up at 6 AM every morning.",
+        {
+          level: "A2",
+          verb: "BREAK",
+          hint: "To break",
+          target: "down",
+          definition:
+            "To stop functioning (for machines, engines, or spaceships).",
+          indonesian: "Rusak (mesin atau pesawat luar angkasa)",
+          example: "Our rocket is breaking down! (Roket kita sedang rusak!)",
         },
-        "A2-get-on": {
-          emoji: "🚌",
-          meaning:
-            "Naik ke dalam kendaraan umum seperti bus, kereta, atau pesawat.",
-          example: "We need to get on the next bus quickly.",
+        {
+          level: "A2",
+          verb: "BLOW",
+          hint: "To blow",
+          target: "up",
+          definition:
+            "To explode or destroy by explosion (like a planet or enemy ship).",
+          indonesian: "Meledak / meledakkan (planet atau pesawat musuh)",
+          example:
+            "The aliens want to blow up the Earth. (Para alien ingin meledakkan Bumi.)",
         },
-        "A2-get-off": {
-          emoji: "🚉",
-          meaning:
-            "Turun dari kendaraan umum seperti bus, kereta, atau pesawat.",
-          example: "Let's get off at the next station.",
+        {
+          level: "A2",
+          verb: "TAKE",
+          hint: "To take",
+          target: "off",
+          definition: "To leave the ground and fly into space.",
+          indonesian: "Lepas landas (terbang ke luar angkasa)",
+          example:
+            "The UFO is ready to take off. (UFO-nya siap untuk lepas landas.)",
         },
-        "A2-give-up": {
-          emoji: "🏳️",
-          meaning:
-            "Menyerah, berhenti mencoba, atau berhenti melakukan suatu kebiasaan.",
-          example: "Never give up on your dreams, cadet!",
+        {
+          level: "A2",
+          verb: "LOOK",
+          hint: "To look",
+          target: "for",
+          definition:
+            "To search for something or someone (like aliens or a new planet).",
+          indonesian: "Mencari (alien, planet baru, atau barang hilang)",
+          example:
+            "They are looking for life on Mars. (Mereka sedang mencari kehidupan di Mars.)",
         },
-        "A2-give-back": {
-          emoji: "🔙",
-          meaning:
-            "Mengembalikan barang yang sebelumnya dipinjam kepada pemiliknya.",
-          example: "Please give back my book tomorrow.",
+        {
+          level: "A2",
+          verb: "RUN",
+          hint: "To run",
+          target: "away",
+          definition:
+            "To escape from danger or a threat (like monster/alien attacks).",
+          indonesian: "Melarikan diri / kabur (dari serangan monster/alien)",
+          example:
+            "Run away! The monster is coming! (Lari! Monsternya datang!)",
         },
-        "A2-give-away": {
-          emoji: "🎁",
-          meaning:
-            "Memberikan sesuatu kepada orang lain secara gratis atau sebagai hadiah.",
-          example: "They give away free coffee at the station today.",
+        {
+          level: "A2",
+          verb: "WATCH",
+          hint: "To watch",
+          target: "out",
+          definition: "To be careful or alert to danger on a strange planet.",
+          indonesian: "Awas / berhati-hati (terhadap bahaya di planet asing)",
+          example:
+            "Watch out for the alien trap! (Awas terhadap jebakan alien!)",
         },
-        "A2-set-up": {
-          emoji: "⚙️",
-          meaning:
-            "Memasang alat, mengatur perlengkapan, atau mendirikan organisasi/bisnis.",
-          example: "They want to set up a new company next year.",
+        {
+          level: "A2",
+          verb: "GO",
+          hint: "To go",
+          target: "back",
+          definition:
+            "To return to a previous place (like Earth or back in time).",
+          indonesian: "Kembali (ke Bumi atau ke masa lalu memakai mesin waktu)",
+          example: "We must go back to Earth. (Kita harus kembali ke Bumi.)",
         },
-        "A2-set-off": {
-          emoji: "🚀",
-          meaning: "Memulai sebuah perjalanan panjang atau ekspedisi.",
-          example: "We must set off early tomorrow morning.",
+        {
+          level: "A2",
+          verb: "FIND",
+          hint: "To find",
+          target: "out",
+          definition: "To discover or learn a secret fact or plan.",
+          indonesian: "Mengetahui / menemukan rahasia",
+          example:
+            "He wants to find out the alien's secret plan. (Dia ingin mengetahui rencana rahasia alien.)",
         },
-        "A2-set-down": {
-          emoji: "📦",
-          meaning: "Meletakkan benda yang sedang dibawa ke atas permukaan.",
-          example: "She set down her heavy bags on the floor.",
+        {
+          level: "A2",
+          verb: "CLEAN",
+          hint: "To clean",
+          target: "up",
+          definition: "To clean or tidy a place (like a lab or rocket debris).",
+          indonesian: "Membersihkan (laboratorium atau puing-puing roket)",
+          example:
+            "The robots clean up the spaceship every day. (Para robot membersihkan pesawat luar angkasa setiap hari.)",
         },
-        "A2-take-off": {
-          emoji: "✈️",
-          meaning:
-            "Pesawat mulai terbang (lepas landas) atau tindakan melepas pakaian/sepatu.",
-          example: "Please take off your shoes inside the cabin.",
+        {
+          level: "A2",
+          verb: "COME",
+          hint: "To come",
+          target: "back",
+          definition: "To return to the original starting point or location.",
+          indonesian: "Kembali lagi ke tempat semula",
+          example:
+            "The astronaut will come back next year. (Astronot itu akan kembali tahun depan.)",
         },
-        "A2-take-out": {
-          emoji: "🗑️",
-          meaning: "Mengeluarkan sesuatu dari dalam wadah, tas, atau rumah.",
-          example: "Please take out the trash before you leave.",
+        {
+          level: "A2",
+          verb: "GET",
+          hint: "To get",
+          target: "in",
+          definition:
+            "To enter a small vehicle (like a flying car or space capsule).",
+          indonesian: "Masuk ke dalam (mobil terbang atau kapsul luar angkasa)",
+          example:
+            "Get in the capsule, quickly! (Masuk ke dalam kapsul, cepat!)",
         },
-        "A2-take-back": {
-          emoji: "🛍️",
-          meaning:
-            "Mengembalikan barang yang baru dibeli ke toko karena rusak atau tidak cocok.",
-          example: "I need to take back this shirt; it is too small.",
-        },
-        "A2-take-away": {
-          emoji: "🥡",
-          meaning:
-            "Mengambil sesuatu (biasanya makanan) untuk dibawa pulang atau menjauhkan sesuatu.",
-          example: "I ordered a pizza to take away.",
-        },
-        "A2-put-on": {
-          emoji: "🧥",
-          meaning:
-            "Mengenakan pakaian, sepatu, perhiasan, atau kacamata pada tubuh.",
-          example: "Put on your jacket, it is cold in deep space.",
-        },
-        "A2-put-down": {
-          emoji: "🔪",
-          meaning:
-            "Meletakkan barang yang sedang dipegang atau berhenti membaca buku.",
-          example: "Put down that tool, it is dangerous.",
-        },
-        "A2-put-away": {
-          emoji: "🧸",
-          meaning:
-            "Merapikan barang dan meletakkannya kembali ke tempat penyimpanannya.",
-          example: "Kids, please put away your toys now.",
-        },
-        "A2-turn-on": {
-          emoji: "💡",
-          meaning:
-            "Menyalakan aliran listrik pada alat elektronik, mesin, atau lampu.",
-          example: "Can you turn on the light? It is dark here.",
-        },
-        "A2-turn-off": {
-          emoji: "📺",
-          meaning: "Mematikan aliran listrik pada alat elektronik atau lampu.",
-          example: "Please turn off the TV before sleeping.",
-        },
-        "A2-turn-around": {
-          emoji: "🔄",
-          meaning:
-            "Memutar posisi badan atau kendaraan ke arah yang berlawanan.",
-          example: "Turn around and look at the beautiful stars.",
+        {
+          level: "A2",
+          verb: "PLUG",
+          hint: "To plug",
+          target: "in",
+          definition:
+            "To connect an electrical device to a power source (to charge a robot).",
+          indonesian: "Mencolokkan kabel ke listrik (untuk mengisi daya robot)",
+          example:
+            "Plug in the robot; its battery is low. (Colokkan kabel robotnya; baterainya lemah.)",
         },
 
-        // --- LEVEL B1 ---
-        "B1-look-forward to": {
-          emoji: "🤩",
-          meaning:
-            "Merasa sangat senang dan menantikan sesuatu yang akan terjadi di masa depan.",
-          example: "I look forward to meeting you in person.",
+        // --- SEKTOR B2 (Command Center) - 10 Soal ---
+        {
+          level: "B2",
+          verb: "LOOK",
+          hint: "To look",
+          target: "down on",
+          definition: "To think that someone is less important or inferior.",
+          indonesian: "Meremehkan atau memandang rendah orang lain",
+          example:
+            "You shouldn't look down on someone just because they don't have a degree.",
         },
-        "B1-look-into": {
-          emoji: "🕵️",
-          meaning:
-            "Menyelidiki, memeriksa, atau mencari tahu fakta-fakta tentang suatu masalah.",
-          example: "The police will look into the case immediately.",
+        {
+          level: "B2",
+          verb: "LOOK",
+          hint: "To look",
+          target: "up to",
+          definition: "To admire and respect someone greatly as a role model.",
+          indonesian:
+            "Sangat mengagumi atau menghormati seseorang sebagai teladan",
+          example: "Many young athletes look up to Cristiano Ronaldo.",
         },
-        "B1-look-over": {
-          emoji: "📄",
-          meaning:
-            "Memeriksa atau meninjau sesuatu secara cepat untuk mendapatkan gambaran umum.",
-          example: "Please look over this contract before signing it.",
+        {
+          level: "B2",
+          verb: "GET",
+          hint: "To get",
+          target: "along with",
+          definition:
+            "To have a friendly, harmonious relationship with someone.",
+          indonesian: "Memiliki hubungan yang baik dan akrab dengan seseorang",
+          example: "I really get along with my new coworkers.",
         },
-        "B1-get-along with": {
-          emoji: "🤝",
-          meaning: "Memiliki hubungan yang ramah dan baik dengan orang lain.",
-          example: "Do you get along with your new boss?",
+        {
+          level: "B2",
+          verb: "CUT",
+          hint: "To cut",
+          target: "down on",
+          definition:
+            "To reduce the consumption or amount of something (e.g., sugar).",
+          indonesian:
+            "Mengurangi jumlah konsumsi sesuatu (seperti makanan manis atau rokok)",
+          example: "The doctor told him to cut down on sugar.",
         },
-        "B1-get-over": {
-          emoji: "🤕",
-          meaning:
-            "Pulih atau merasa lebih baik setelah sakit, kesedihan, atau kegagalan.",
-          example: "She finally got over her illness after a week.",
+        {
+          level: "B2",
+          verb: "KEEP",
+          hint: "To keep",
+          target: "up with",
+          definition:
+            "To stay informed about the latest progress or match someone's speed.",
+          indonesian:
+            "Mengikuti perkembangan terbaru atau menyamai kecepatan orang lain",
+          example: "Technology changes so fast, it's hard to keep up with it.",
         },
-        "B1-get-by": {
-          emoji: "🍞",
-          meaning: "Bertahan hidup meski dengan sumber daya terbatas.",
-          example: "My English is not perfect, but I can get by.",
+        {
+          level: "B2",
+          verb: "FACE",
+          hint: "To face",
+          target: "up to",
+          definition: "To accept and deal with a difficult reality or problem.",
+          indonesian:
+            "Menerima dan menghadapi kenyataan pahit atau masalah yang sulit",
+          example: "She needs to face up to the fact that she failed the test.",
         },
-        "B1-get-away": {
-          emoji: "🏃",
-          meaning:
-            "Melarikan diri dari situasi sulit atau pergi berlibur untuk beristirahat.",
-          example: "We decided to get away for the weekend.",
+        {
+          level: "B2",
+          verb: "GET",
+          hint: "To get",
+          target: "away with",
+          definition:
+            "To escape punishment or consequences for a wrong action.",
+          indonesian:
+            "Lolos dari hukuman atau konsekuensi atas kesalahan yang dilakukan",
+          example:
+            "The thief managed to get away with stealing the expensive watch.",
         },
-        "B1-give-in": {
-          emoji: "🤐",
-          meaning:
-            "Akhirnya setuju atau menyerah setelah awalnya menolak tekanan.",
-          example: "The government refused to give in to demands.",
+        {
+          level: "B2",
+          verb: "MAKE",
+          hint: "To make",
+          target: "up for",
+          definition: "To compensate for a mistake, loss, or wasted time.",
+          indonesian:
+            "Mengganti kerugian, kesalahan, atau waktu yang hilang dengan sesuatu yang baik",
+          example: "I bought her flowers to make up for being late.",
         },
-        "B1-give-out": {
-          emoji: "📝",
-          meaning: "Membagikan sesuatu kepada sekelompok orang (distribusi).",
-          example: "The teacher will give out the exam papers now.",
+        {
+          level: "B2",
+          verb: "PUT",
+          hint: "To put",
+          target: "up with",
+          definition:
+            "To tolerate or patiently endure an annoying situation or person.",
+          indonesian:
+            "Mentoleransi atau bersabar menghadapi situasi/orang yang menyebalkan",
+          example: "I cannot put up with his constant complaining anymore.",
         },
-        "B1-give-off": {
-          emoji: "💨",
-          meaning: "Memancarkan sesuatu seperti bau, panas, cahaya, atau asap.",
-          example: "This old engine gives off a lot of smoke.",
+        {
+          level: "B2",
+          verb: "RUN",
+          hint: "To run",
+          target: "out of",
+          definition:
+            "To use up the available supply of something (e.g., fuel or time).",
+          indonesian: "Kehabisan persediaan sesuatu (uang, waktu, atau barang)",
+          example: "We have run out of coffee, so I need to buy some.",
         },
-        "B1-set-back": {
-          emoji: "⏳",
-          meaning: "Menunda kemajuan suatu proyek atau rencana.",
-          example: "The heavy rain set back the construction for weeks.",
-        },
-        "B1-set-apart": {
-          emoji: "🌟",
-          meaning:
-            "Kualitas yang membuat seseorang/sesuatu terlihat jauh lebih baik/berbeda.",
-          example: "Her high quality work sets her apart from others.",
-        },
-        "B1-set-aside": {
-          emoji: "💰",
-          meaning: "Menyisihkan waktu, uang, atau barang untuk tujuan khusus.",
-          example: "You should set aside some money for emergencies.",
-        },
-        "B1-take-over": {
-          emoji: "🏢",
-          meaning:
-            "Mengambil kendali, tanggung jawab, atau kepemimpinan atas sesuatu.",
-          example: "IBM will take over the smaller tech firm.",
-        },
-        "B1-take-up": {
-          emoji: "📸",
-          meaning:
-            "Mulai mempelajari atau melakukan hobi, aktivitas, atau pekerjaan baru.",
-          example: "He decided to take up photography as a hobby.",
-        },
-        "B1-take-in": {
-          emoji: "🧠",
-          meaning:
-            "Berhasil memahami, menyerap, atau mengingat informasi yang baru diterima.",
-          example: "The lecture was so fast that I couldn't take it all in.",
-        },
-        "B1-put-off": {
-          emoji: "📅",
-          meaning: "Menunda melakukan sesuatu hingga waktu yang lebih lambat.",
-          example: "Never put off what you can do today.",
-        },
-        "B1-put-up with": {
-          emoji: "😤",
-          meaning:
-            "Mentoleransi situasi atau orang yang tidak menyenangkan tanpa mengeluh.",
-          example: "I cannot put up with this noise anymore.",
-        },
-        "B1-put-out": {
-          emoji: "🧯",
-          meaning: "Memadamkan api, kebakaran, atau rokok.",
-          example: "It took two hours to put out the forest fire.",
-        },
-        "B1-turn-down": {
-          emoji: "❌",
-          meaning: "Menolak tawaran, undangan, atau permohonan secara resmi.",
-          example: "She turned down the job offer from London.",
-        },
-        "B1-turn-up": {
-          emoji: "👋",
-          meaning: "Datang atau muncul di suatu tempat (biasanya terlambat).",
-          example: "He turned up at the party uninvited.",
-        },
-        "B1-turn-out": {
-          emoji: "🎭",
-          meaning:
-            "Hasil akhir suatu kejadian yang terbukti menjadi sesuatu yang tidak disangka.",
-          example: "The exam turned out to be easier than I thought.",
-        },
-      };
+      ];
 
-      const VERBS = ["Look", "Get", "Give", "Set", "Take", "Put", "Turn"];
-      let currentLevel = "A2";
+      const ALL_PREPOSITIONS = [
+        "on",
+        "off",
+        "in",
+        "down",
+        "up",
+        "away",
+        "out",
+        "back",
+        "for",
+        "down on",
+        "up to",
+        "along with",
+        "up with",
+        "away with",
+        "up for",
+        "out of",
+      ];
+
+      // Status Game Sektor
+      let currentSector = "A2";
+      let activeStages = [];
+      let currentStageIndex = 0; // Index internal dalam activeStages
+
+      let score = 0;
+      let fuel = 10;
       let discovered = new Set();
-      const totalPhrasal = Object.keys(DATABASE).length;
+      let selectedPrepElement = null; // Memori untuk Click-to-Move mobile
 
-      function init() {
-        renderMap();
-        renderPreps();
-        updateProgress();
-      }
-
-      function filterLevel(level) {
-        currentLevel = level;
-        document
-          .querySelectorAll(".tab-btn")
-          .forEach((b) => b.classList.remove("active"));
-        document.getElementById(`btn-${level}`).classList.add("active");
-        document.getElementById("current-level-label").innerText =
-          level === "A2" ? "(A2 Elementary)" : "(B1 Intermediate)";
-        renderMap();
-        renderPreps();
-      }
-
-      function renderMap() {
-        const grid = document.getElementById("core-grid");
-        grid.innerHTML = "";
-        VERBS.forEach((verb) => {
-          const card = document.createElement("div");
-          card.className =
-            "drop-zone glass-panel p-6 border-dashed border-2 border-white/10 flex flex-col items-center gap-4 transition-all duration-300 hover:border-blue-500/50";
-          card.dataset.verb = verb.toLowerCase();
-          card.innerHTML = `
-                    <div class="verb-core w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold active-core text-white">
-                        ${verb[0]}
-                    </div>
-                    <span class="font-bold tracking-widest text-lg text-white">${verb.toUpperCase()}</span>
-                    <div class="flex gap-1">
-                         <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
-                         <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-                         <div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
-                    </div>
-                `;
-          card.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            card.classList.add("drag-over");
-          });
-          card.addEventListener("dragleave", () =>
-            card.classList.remove("drag-over"),
-          );
-          card.addEventListener("drop", handleDrop);
-          grid.appendChild(card);
-        });
-      }
-
-      function renderPreps() {
-        const container = document.getElementById("prep-container");
-        container.innerHTML = "";
-        const activePreps = new Set();
-        Object.keys(DATABASE).forEach((key) => {
-          if (key.startsWith(currentLevel)) {
-            const parts = key.split("-");
-            if (parts.length >= 3) activePreps.add(parts[2]);
-          }
-        });
-
-        Array.from(activePreps)
-          .sort()
-          .forEach((prep) => {
-            const el = document.createElement("div");
-            el.className =
-              "prep-module px-3 py-2 rounded-lg font-bold text-[10px] md:text-xs uppercase shadow-lg text-white";
-            el.draggable = true;
-            el.innerText = prep;
-            el.dataset.prep = prep;
-
-            // FIX GHOSTING: Gunakan timeout agar gaya transparansi tidak tertangkap sebagai drag image
-            el.addEventListener("dragstart", (e) => {
-              e.dataTransfer.setData("prep", prep);
-              e.dataTransfer.effectAllowed = "move";
-              setTimeout(() => {
-                el.classList.add("dragging");
-              }, 0);
-            });
-
-            el.addEventListener("dragend", () => {
-              el.classList.remove("dragging");
-            });
-
-            container.appendChild(el);
-          });
-      }
-
-      function handleDrop(e) {
-        e.preventDefault();
-        this.classList.remove("drag-over");
-        const verb = this.dataset.verb;
-        const prep = e.dataTransfer.getData("prep");
-        const key = `${currentLevel}-${verb}-${prep}`;
-
-        if (DATABASE[key]) {
-          showModal(key);
-          if (!discovered.has(key)) {
-            discovered.add(key);
-            updateProgress();
-          }
-        } else {
-          triggerError(this);
+      // Inisialisasi Latar Bintang
+      function initStars() {
+        const starfield = document.getElementById("starfield");
+        starfield.innerHTML = "";
+        const count = 40;
+        for (let i = 0; i < count; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          const size = Math.random() * 2 + 1;
+          star.style.width = `${size}px`;
+          star.style.height = `${size}px`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.animationDelay = `${Math.random() * 3}s`;
+          starfield.appendChild(star);
         }
       }
 
-      function showModal(key) {
-        const data = DATABASE[key];
+      // Load Status Sektor dan Progres dari LocalStorage
+      function loadGameState() {
+        const savedScore = localStorage.getItem("astralingo_fusion_score");
+        const savedSector = localStorage.getItem(
+          "astralingo_fusion_selected_sector",
+        );
+        const savedDiscovered = localStorage.getItem(
+          "astralingo_fusion_discovered",
+        );
+
+        if (savedScore) {
+          score = parseInt(savedScore, 10);
+          document.getElementById("fusion-score").innerText = `${score} Pts`;
+        }
+        if (savedSector === "A2" || savedSector === "B2") {
+          currentSector = savedSector;
+        } else {
+          currentSector = "A2";
+        }
+        if (savedDiscovered) {
+          discovered = new Set(JSON.parse(savedDiscovered));
+        }
+
+        // Sinkronisasi tombol navigasi sektor
+        updateSectorTabsUI();
+
+        // Ambil index stage tersimpan berdasarkan sektor terpilih
+        const savedStageForSector = localStorage.getItem(
+          `astralingo_fusion_stage_${currentSector}`,
+        );
+        currentStageIndex = savedStageForSector
+          ? parseInt(savedStageForSector, 10)
+          : 0;
+
+        filterStagesAndLoad();
+      }
+
+      // Filter Misi berdasarkan Sektor yang Dipilih
+      function filterStagesAndLoad() {
+        activeStages = STAGES.filter((s) => s.level === currentSector);
+        if (currentStageIndex >= activeStages.length) {
+          currentStageIndex = 0; // Safeguard jika level selesai
+        }
+
+        document.getElementById("active-sector-indicator").innerText =
+          currentSector;
+        updateProgress();
+        loadStage();
+      }
+
+      // Menyimpan GameState ke LocalStorage
+      function saveGameState() {
+        localStorage.setItem("astralingo_fusion_score", score);
+        localStorage.setItem(
+          "astralingo_fusion_selected_sector",
+          currentSector,
+        );
+        localStorage.setItem(
+          `astralingo_fusion_stage_${currentSector}`,
+          currentStageIndex,
+        );
+        localStorage.setItem(
+          "astralingo_fusion_discovered",
+          JSON.stringify(Array.from(discovered)),
+        );
+      }
+
+      // Update Tampilan UI Tab Sektor Aktif
+      function updateSectorTabsUI() {
+        const a2Btn = document.getElementById("sector-a2-btn");
+        const b2Btn = document.getElementById("sector-b2-btn");
+
+        if (currentSector === "A2") {
+          a2Btn.className =
+            "flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-bold space-font tracking-wider uppercase transition-all duration-300 sector-btn-active";
+          b2Btn.className =
+            "flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-bold space-font tracking-wider uppercase transition-all duration-300 sector-btn-inactive ml-1";
+        } else {
+          a2Btn.className =
+            "flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-bold space-font tracking-wider uppercase transition-all duration-300 sector-btn-inactive";
+          b2Btn.className =
+            "flex-1 sm:flex-initial px-6 py-2.5 rounded-xl text-xs font-bold space-font tracking-wider uppercase transition-all duration-300 sector-btn-active ml-1";
+        }
+      }
+
+      // Switch Sektor dari Input Tab User
+      function switchSector(sector) {
+        if (currentSector === sector) return;
+        currentSector = sector;
+        updateSectorTabsUI();
+
+        // Ambil stage tersimpan untuk sektor baru
+        const savedStageForSector = localStorage.getItem(
+          `astralingo_fusion_stage_${currentSector}`,
+        );
+        currentStageIndex = savedStageForSector
+          ? parseInt(savedStageForSector, 10)
+          : 0;
+
+        filterStagesAndLoad();
+        saveGameState();
+      }
+
+      // Update Tampilan Misi Berdasarkan Stage Aktif
+      function loadStage() {
+        if (activeStages.length === 0) return;
+
+        const stage = activeStages[currentStageIndex];
+        document.getElementById("current-stage").innerText =
+          `STAGE ${currentStageIndex + 1}/${activeStages.length}`;
+        document.getElementById("base-verb").innerText = stage.verb;
+        document.getElementById("verb-indonesian-hint").innerText =
+          `(${stage.hint})`;
+        document.getElementById("target-definition").innerText =
+          `"${stage.definition}"`;
+
+        // Reset Area Fusion Core
+        const chamber = document.getElementById("fusion-chamber");
+        const core = document.getElementById("chamber-core");
+        chamber.className =
+          "flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-slate-700 hover:border-blue-500/50 bg-slate-950/80 transition-all duration-300 cursor-pointer min-h-[140px]";
+        core.innerHTML = `
+          <div class="text-3xl text-slate-600 animate-pulse font-extrabold tracking-wider">?</div>
+          <span class="text-xs text-blue-400/80 space-font block mt-2">TAP OR DROP HERE</span>
+        `;
+
+        // Render Opsi Preposisi
+        renderPrepositions();
+        updateDiscoveredList();
+
+        // Reset Click-to-Move Selection
+        selectedPrepElement = null;
+      }
+
+      // Render Pilihan Kartu Preposisi
+      function renderPrepositions() {
+        const bank = document.getElementById("prepositions-bank");
+        bank.innerHTML = "";
+
+        const currentTarget = activeStages[currentStageIndex].target;
+
+        // Ambil distractor yang sesuai format sektor aktif agar tidak terlalu mudah ditebak
+        const sectorTargets = Array.from(
+          new Set(activeStages.map((s) => s.target)),
+        ).filter((t) => t !== currentTarget);
+
+        const choices = [currentTarget];
+
+        // Pilih dari distractor target internal sektor dulu
+        while (choices.length < 4 && sectorTargets.length > 0) {
+          const randIndex = Math.floor(Math.random() * sectorTargets.length);
+          const randTarget = sectorTargets.splice(randIndex, 1)[0];
+          choices.push(randTarget);
+        }
+
+        // Lengkapkan opsi sisa dari general pool
+        while (choices.length < 4) {
+          const rand =
+            ALL_PREPOSITIONS[
+              Math.floor(Math.random() * ALL_PREPOSITIONS.length)
+            ];
+          if (!choices.includes(rand)) choices.push(rand);
+        }
+
+        // Kocok Opsi Pilihan
+        choices.sort(() => Math.random() - 0.5);
+
+        choices.forEach((prep) => {
+          const card = document.createElement("div");
+          card.className =
+            "prep-card p-3 rounded-xl border border-slate-800 bg-slate-900/60 hover-float text-center cursor-pointer select-none space-font text-xs sm:text-sm font-semibold text-blue-300 transition-all";
+          card.draggable = true;
+          card.dataset.prep = prep;
+          card.innerText = prep.toUpperCase();
+
+          // --- LOGIKA DRAG AND DROP (Desktop) ---
+          card.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", prep);
+            card.classList.add("opacity-50", "scale-95");
+          });
+
+          card.addEventListener("dragend", () => {
+            card.classList.remove("opacity-50", "scale-95");
+          });
+
+          // --- LOGIKA CLICK-TO-MOVE (Sempurna & Responsif untuk Mobile HP) ---
+          card.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            // Deselect jika mengklik ulang yang sama
+            if (selectedPrepElement === card) {
+              card.classList.remove("prep-selected");
+              selectedPrepElement = null;
+              document
+                .getElementById("fusion-chamber")
+                .classList.remove("pulse-energy-active");
+            } else {
+              document.querySelectorAll(".prep-card").forEach((c) => {
+                c.classList.remove("prep-selected");
+              });
+
+              selectedPrepElement = card;
+              card.classList.add("prep-selected");
+
+              // Glow animasi pada target
+              document
+                .getElementById("fusion-chamber")
+                .classList.add("pulse-energy-active");
+            }
+          });
+
+          bank.appendChild(card);
+        });
+      }
+
+      // Memproses hasil fusi kata kerja & preposisi
+      function fusePreposition(prepName, elementSource) {
+        const stage = activeStages[currentStageIndex];
+        const isCorrect = prepName.toLowerCase() === stage.target.toLowerCase();
+
+        if (isCorrect) {
+          playAudio(`${stage.verb} ${stage.target}`);
+
+          const chamber = document.getElementById("fusion-chamber");
+          chamber.className =
+            "flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-emerald-500 bg-emerald-950/20 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all duration-300 min-h-[140px]";
+
+          const core = document.getElementById("chamber-core");
+          core.innerHTML = `
+            <div class="text-2xl sm:text-3xl text-emerald-400 font-extrabold tracking-wider animate-bounce">${stage.verb} ${stage.target.toUpperCase()}</div>
+            <span class="text-xs text-emerald-400 font-bold space-font block mt-2">FUSION STABLE! ⚡</span>
+          `;
+
+          // Hitung Poin & Tambahkan ke status Terbuka
+          const verbPrepKey = `${stage.verb}-${stage.target}`;
+          if (!discovered.has(verbPrepKey)) {
+            score += 50;
+            discovered.add(verbPrepKey);
+          }
+
+          document.getElementById("fusion-score").innerText = `${score} Pts`;
+
+          setTimeout(() => {
+            showModal(stage);
+          }, 800);
+        } else {
+          fuel = Math.max(0, fuel - 1);
+          document.getElementById("fuel-count").innerText = `${fuel} / 10 🚀`;
+          triggerError(document.getElementById("fusion-chamber"));
+
+          score = Math.max(0, score - 10);
+          document.getElementById("fusion-score").innerText = `${score} Pts`;
+
+          if (fuel <= 0) {
+            setTimeout(() => {
+              alert(
+                "🚨 EMERGENCY: Space fuel depleted! Refueling power tank...",
+              );
+              fuel = 10;
+              document.getElementById("fuel-count").innerText =
+                `${fuel} / 10 🚀`;
+            }, 500);
+          }
+        }
+      }
+
+      // Efek kedip merah saat salah
+      function triggerError(el) {
+        el.style.borderColor = "#ef4444";
+        el.style.background = "rgba(239, 68, 68, 0.15)";
+        el.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.4)";
+        setTimeout(() => {
+          el.style.borderColor = "";
+          el.style.background = "";
+          el.style.boxShadow = "";
+        }, 600);
+      }
+
+      // Voice synthesis pelafalan native
+      function playAudio(phrase) {
+        if ("speechSynthesis" in window) {
+          const synth = window.speechSynthesis;
+          const utter = new SpeechSynthesisUtterance(phrase);
+          utter.lang = "en-US";
+          utter.rate = 0.85;
+          synth.speak(utter);
+        }
+      }
+
+      // Tampilkan Modal Berhasil Normal
+      function showModal(stage) {
         const overlay = document.getElementById("modal-overlay");
         const card = document.getElementById("modal-card");
 
-        document.getElementById("modal-emoji").innerText = data.emoji;
-        document.getElementById("modal-title").innerText = key
-          .split("-")
-          .slice(1)
-          .join(" ")
-          .toUpperCase();
-        document.getElementById("modal-meaning").innerText = `${data.meaning}`;
+        document.getElementById("modal-phrasal").innerText =
+          `${stage.verb} ${stage.target.toUpperCase()}`;
+        document.getElementById("modal-translation").innerText =
+          stage.indonesian;
         document.getElementById("modal-example").innerText =
-          `"${data.example}"`;
+          `"${stage.example}"`;
+
         overlay.classList.remove("hidden");
         setTimeout(() => {
           overlay.classList.add("opacity-100");
           card.classList.remove("scale-90");
           card.classList.add("scale-100");
         }, 10);
-
-        const synth = window.speechSynthesis;
-        const utter = new SpeechSynthesisUtterance(
-          key.split("-").slice(1).join(" "),
-        );
-        utter.lang = "en-US";
-        utter.rate = 0.85;
-        synth.speak(utter);
       }
 
+      // Menutup modal & Memajukan Stage
       function closeModal() {
         const overlay = document.getElementById("modal-overlay");
         const card = document.getElementById("modal-card");
         overlay.classList.remove("opacity-100");
         card.classList.add("scale-90");
-        setTimeout(() => overlay.classList.add("hidden"), 300);
-      }
 
-      function triggerError(el) {
-        el.style.borderColor = "#ef4444";
-        el.style.background = "rgba(239, 68, 68, 0.15)";
         setTimeout(() => {
-          el.style.borderColor = "";
-          el.style.background = "";
-        }, 600);
+          overlay.classList.add("hidden");
+
+          // Maju ke level berikutnya
+          currentStageIndex++;
+
+          // Hitung total stage terpetakan di sektor saat ini
+          const activeLevelCount = activeStages.length;
+          const discoveredInActiveSector = activeStages.filter((s) =>
+            discovered.has(`${s.verb}-${s.target}`),
+          ).length;
+
+          saveGameState();
+          updateProgress();
+
+          if (discoveredInActiveSector === activeLevelCount) {
+            // JIKA MENCAPAI 100% SECARA GLOBAL DI SEKTOR AKTIF
+            showCelebrationModal();
+          } else {
+            // Maju biasa
+            if (currentStageIndex >= activeStages.length) {
+              currentStageIndex = 0; // Loop kembali ke awal jika belum semua didecode
+            }
+            saveGameState();
+            loadStage();
+          }
+        }, 300);
       }
 
+      // Modal Perayaan 100% Kelulusan Sektor
+      function showCelebrationModal() {
+        const overlay = document.getElementById("congrats-overlay");
+        const card = document.getElementById("congrats-card");
+
+        document.getElementById("congrats-score").innerText = `${score} Pts`;
+        document.getElementById("congrats-sector-name").innerText =
+          currentSector;
+
+        const warpBtn = document.getElementById("congrats-warp-btn");
+
+        if (currentSector === "A2") {
+          document.getElementById("congrats-title").innerText =
+            "Sector A2 Completed!";
+          document.getElementById("congrats-message").innerText =
+            "Stellar work, Cadet! All 15 Phrasal Verbs in Sector A2 (Trade Belt) have been successfully synchronized to the command center. Your fusion engine is stable enough to warp to the Command Center!";
+          warpBtn.classList.remove("hidden");
+        } else {
+          document.getElementById("congrats-title").innerText =
+            "Sector B2 Completed!";
+          document.getElementById("congrats-message").innerText =
+            "Outstanding, Admiral! You have successfully mastered all high-level phrasal verbs in Sector B2 (Command Center). All navigation systems are running at maximum cosmic efficiency!";
+          warpBtn.classList.add("hidden");
+        }
+
+        overlay.classList.remove("hidden");
+        setTimeout(() => {
+          overlay.classList.add("opacity-100");
+          card.classList.remove("scale-90");
+          card.classList.add("scale-100");
+        }, 10);
+      }
+
+      // Menutup modal Congrats untuk mereview index kosa kata di bagian kanan
+      function reviewVocabulary() {
+        const overlay = document.getElementById("congrats-overlay");
+        const card = document.getElementById("congrats-card");
+        overlay.classList.remove("opacity-100");
+        card.classList.add("scale-90");
+        setTimeout(() => {
+          overlay.classList.add("hidden");
+          // Smooth scroll ke bagian fusi index untuk memudahkan user mereview
+          document
+            .getElementById("discovered-list")
+            .scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
+
+      // Melakukan reset fusi index di sektor yang aktif saat ini untuk bermain lagi
+      function resetAndPlayAgain() {
+        const sectorLabel =
+          currentSector === "A2"
+            ? "Sector A2 (Trade Belt)"
+            : "Sector B2 (Command Center)";
+        if (
+          confirm(
+            `Are you sure you want to reset your progress in ${sectorLabel}? All discovered words in this sector will be cleared.`,
+          )
+        ) {
+          const overlay = document.getElementById("congrats-overlay");
+          const card = document.getElementById("congrats-card");
+          overlay.classList.remove("opacity-100");
+          card.classList.add("scale-90");
+          setTimeout(() => {
+            overlay.classList.add("hidden");
+
+            // Hapus progress fusi sektor yang sedang aktif saja
+            activeStages.forEach((stage) => {
+              discovered.delete(`${stage.verb}-${stage.target}`);
+            });
+            currentStageIndex = 0;
+            saveGameState();
+            updateProgress();
+            loadStage();
+          }, 300);
+        }
+      }
+
+      // Melompat ke Sektor B2 secara otomatis dari tombol Congrats modal Sektor A2
+      function warpToB2() {
+        const overlay = document.getElementById("congrats-overlay");
+        const card = document.getElementById("congrats-card");
+        overlay.classList.remove("opacity-100");
+        card.classList.add("scale-90");
+        setTimeout(() => {
+          overlay.classList.add("hidden");
+          switchSector("B2");
+        }, 300);
+      }
+
+      // Hitung bar persentase index kemajuan di sektor aktif
       function updateProgress() {
-        const count = discovered.size;
-        const percent = (count / totalPhrasal) * 100;
+        const total = activeStages.length;
+        if (total === 0) return;
+
+        const count = activeStages.filter((s) =>
+          discovered.has(`${s.verb}-${s.target}`),
+        ).length;
+        const percent = Math.round((count / total) * 100);
+
+        document.getElementById("progress-percent").innerText = `${percent}%`;
         document.getElementById("progress-bar").style.width = `${percent}%`;
-        document.getElementById("score-text").innerText =
-          `${count} / ${totalPhrasal}`;
       }
 
-      window.onload = init;
+      // Tampilkan daftar kosa kata yang telah berhasil dieksplorasi di sektor aktif
+      function updateDiscoveredList() {
+        const list = document.getElementById("discovered-list");
+        list.innerHTML = "";
+
+        // Filter kata yang ter-unlock sesuai sektor yang aktif saat ini
+        const activeSectorKeys = activeStages.filter((s) =>
+          discovered.has(`${s.verb}-${s.target}`),
+        );
+
+        if (activeSectorKeys.length === 0) {
+          list.innerHTML = `<div class="text-center py-6 text-slate-500 italic">No phrasal verbs fused in this sector yet.</div>`;
+          return;
+        }
+
+        activeSectorKeys.forEach((stageRef) => {
+          const item = document.createElement("div");
+          item.className =
+            "p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/60 flex justify-between items-center hover:bg-slate-900/80 transition-all cursor-pointer";
+          item.innerHTML = `
+            <div>
+              <div class="font-bold text-slate-200 text-xs tracking-wide space-font">${stageRef.verb} ${stageRef.target.toUpperCase()}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">${stageRef.indonesian}</div>
+            </div>
+            <span class="text-blue-400 text-xs">🔊</span>
+          `;
+
+          item.addEventListener("click", () => {
+            playAudio(`${stageRef.verb} ${stageRef.target}`);
+          });
+
+          list.appendChild(item);
+        });
+      }
+
+      // Inisialisasi Event Listener Reaktor Inti
+      document.addEventListener("DOMContentLoaded", () => {
+        initStars();
+        loadGameState();
+
+        // Config Drag Over Target Chamber
+        const chamber = document.getElementById("fusion-chamber");
+        chamber.addEventListener("dragover", (e) => {
+          e.preventDefault();
+        });
+
+        // Trigger Drop Event (Desktop)
+        chamber.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const prepName = e.dataTransfer.getData("text/plain");
+          if (prepName) {
+            fusePreposition(prepName);
+          }
+        });
+
+        // Click-To-Move Mobile Target Area
+        chamber.addEventListener("click", () => {
+          if (selectedPrepElement) {
+            const prepText = selectedPrepElement.dataset.prep;
+            if (prepText) {
+              fusePreposition(prepText, selectedPrepElement);
+
+              selectedPrepElement.classList.remove("prep-selected");
+              selectedPrepElement = null;
+              chamber.classList.remove("pulse-energy-active");
+            }
+          }
+        });
+
+        // Hapus seleksi preposisi jika mengklik di luar area permainan
+        document.body.addEventListener("click", (e) => {
+          if (
+            !e.target.closest(".prep-card") &&
+            !e.target.closest("#fusion-chamber")
+          ) {
+            if (selectedPrepElement) {
+              selectedPrepElement.classList.remove("prep-selected");
+              selectedPrepElement = null;
+              chamber.classList.remove("pulse-energy-active");
+            }
+          }
+        });
+      });
     </script>
   </body>
 </html>

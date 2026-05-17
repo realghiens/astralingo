@@ -28,6 +28,7 @@
         color: #e2e8f0;
         min-height: 100vh;
         overflow-x: hidden;
+        touch-action: manipulation;
       }
 
       .stars {
@@ -48,6 +49,14 @@
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid var(--glass-border);
         border-radius: 1rem;
+      }
+
+      /* Premium Glassmorphism for Mobile Sidebar */
+      .glass-card {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       /* Map Styles */
@@ -224,7 +233,7 @@
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
       }
 
-      /* Dropdown custom fix */
+      /* Dropdown Custom Fix */
       .dropdown-content {
         display: none;
         position: absolute;
@@ -247,13 +256,23 @@
         padding: 0.5rem;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
       }
+
+      /* Mobile Menu Slide Animation Transition */
+      #mobile-menu {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(-100%);
+      }
+
+      #mobile-menu.open {
+        transform: translateY(0);
+      }
     </style>
   </head>
   <body>
     <div class="stars"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 nav-blur px-6 py-4">
+    <nav class="fixed top-0 w-full z-[100] nav-blur px-6 py-4">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <!-- Left Side: Logo & Main Nav -->
         <div class="flex items-center gap-10">
@@ -269,28 +288,25 @@
             </h1>
           </a>
 
+          <!-- Desktop Navigation Links (Hidden on Mobile) -->
           <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
-            <a
-              href="index.html"
-              class="text-blue-400 hover:text-blue-300 transition-colors"
+            <a href="index.html" class="hover:text-blue-400 transition-colors"
               >Home</a
             >
-            <a
-              href="handbook.html"
-              class="hover:text-blue-400 transition-colors"
+            <a href="grammar.html" class="hover:text-blue-400 transition-colors"
               >Grammar</a
             >
             <div class="relative group">
               <button
-                class="flex items-center gap-1 hover:text-blue-400 transition-colors outline-none py-2"
+                class="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors outline-none py-2"
               >
                 Games <span class="text-[10px] opacity-50">▼</span>
               </button>
               <div class="dropdown-content">
                 <div class="dropdown-inner">
                   <a
-                    href="index.html"
-                    class="block px-4 py-3 bg-white/10 rounded-xl transition-colors text-xs mb-1 hover:bg-white/20"
+                    href="mission1.html"
+                    class="block px-4 py-3 bg-white/10 rounded-xl transition-colors text-xs mb-1 hover:bg-white/20 text-blue-400 font-bold"
                     >🚀 Galaxy Exploration</a
                   >
                   <a
@@ -309,7 +325,7 @@
           </div>
         </div>
 
-        <!-- Right Side: Status Panel (Fuel & Streak) -->
+        <!-- Right Side: Status Panel (Fuel & Streak) & Hamburger Mobile Menu -->
         <div class="flex items-center gap-6">
           <div
             class="hidden sm:flex items-center gap-2 glass px-4 py-1.5 rounded-full border-blue-500/30"
@@ -333,12 +349,72 @@
           >
             <span>🔥</span> <span id="streak-count" class="text-sm">1</span>
           </div>
-          <div class="md:hidden text-2xl cursor-pointer">☰</div>
+
+          <!-- Hamburger Button (Only visible on Mobile Phones) -->
+          <div class="md:hidden">
+            <button
+              id="hamburger-btn"
+              onclick="toggleMobileMenu()"
+              class="text-2xl text-slate-100 focus:outline-none transition-transform active:scale-90 z-[110] relative flex items-center justify-center"
+            >
+              <span id="menu-icon">☰</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
 
-    <main class="pt-28 px-6 max-w-7xl mx-auto pb-20">
+    <!-- Mobile Menu Overlay (Only active/visible on Mobile Phones) -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-[90] glass-card rounded-none flex flex-col p-8 pt-24 space-y-8 md:hidden"
+    >
+      <div class="flex flex-col space-y-6 text-xl font-bold">
+        <a
+          href="index.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Home</a
+        >
+        <a
+          href="grammar.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Grammar</a
+        >
+        <div class="space-y-4 pt-2">
+          <p class="text-xs font-mono text-blue-400 uppercase tracking-widest">
+            Training Modules
+          </p>
+          <a
+            href="mission1.html"
+            onclick="toggleMobileMenu()"
+            class="flex items-center gap-3 text-lg font-medium text-blue-400"
+            >🚀 Galaxy Exploration</a
+          >
+          <a
+            href="whereami.html"
+            onclick="toggleMobileMenu()"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧩 Galactic Riddle</a
+          >
+          <a
+            href="phrasalverbs.html"
+            onclick="toggleMobileMenu()"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧬 Phrasal Fusion</a
+          >
+        </div>
+      </div>
+      <div class="mt-auto text-center">
+        <p class="text-[10px] text-slate-500 font-mono tracking-widest">
+          AstraLingo OS v2.0
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content Section -->
+    <main class="pt-28 px-6 max-w-7xl mx-auto pb-20 relative z-10">
       <!-- Galaxy Map Section -->
       <section id="map-section">
         <div class="text-center mb-10">
@@ -461,6 +537,19 @@
     </div>
 
     <script>
+      // Fungsi Toggle Menu Mobile Hamburger
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const icon = document.getElementById("menu-icon");
+        const isOpening = !menu.classList.contains("open");
+
+        menu.classList.toggle("open");
+        icon.innerText = isOpening ? "✕" : "☰";
+
+        // Kunci layar utama ketika menu mobile sedang terbuka
+        document.body.style.overflow = isOpening ? "hidden" : "auto";
+      }
+
       const VOCAB_DATA = {
         Space: "The vast area outside Earth's atmosphere.",
         Cadet: "A student training to become an officer.",
@@ -794,6 +883,7 @@
         showAlert("Frequency Stabilized! +1 Warp Fuel.");
       }
 
+      // Planet Stability
       function markAsUnstable(id) {
         if (!state.unstablePlanets.includes(id)) {
           state.unstablePlanets.push(id);

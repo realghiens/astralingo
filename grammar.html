@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>AstraLingo - Galactic Handbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --glass: rgba(15, 23, 42, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --emerald: #10b981;
+        --emerald-glow: rgba(16, 185, 129, 0.4);
+        --fusion-blue: #3b82f6;
+        --fusion-indigo: #6366f1;
+      }
+
+      body {
+        background: radial-gradient(
+          circle at top right,
+          #1e293b,
+          #0f172a,
+          #020617
+        );
+        color: #f8fafc;
+        font-family: "Exo 2", sans-serif;
+        overflow-x: hidden;
+        touch-action: manipulation;
+      }
+
+      .glass-card {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+      }
+
+      /* Styling Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 99px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Dropdown Menu Desktop */
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 220px;
+        margin-top: 10px;
+        z-index: 100;
+        animation: slideDown 0.3s ease-out forwards;
+      }
+
+      .dropdown-content.active {
+        display: block;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Mobile Menu Styles */
+      #mobile-menu {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(-100%);
+      }
+
+      #mobile-menu.open {
+        transform: translateY(0);
+      }
+
+      /* Styling Navbar Utama */
+      .nav-blur {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .space-font {
+        font-family: "Space Mono", monospace;
+      }
+
+      /* Latar Belakang Bintang Statis & Dinamis */
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        animation: pulseStar 3s infinite ease-in-out;
+      }
+
+      @keyframes pulseStar {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen relative pb-12 overflow-x-hidden">
+    <!-- Starfield Background -->
+    <div
+      id="starfield"
+      class="absolute inset-0 pointer-events-none overflow-hidden z-0"
+    ></div>
+
+    <!-- Navigation Bar (Synchronized with index.html) -->
+    <nav class="nav-blur fixed top-0 left-0 w-full z-[100] px-6 py-4">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Logo -->
+        <a
+          href="index.html"
+          class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          <span class="text-3xl">🚀</span>
+          <h1
+            class="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400"
+          >
+            AstraLingo
+          </h1>
+        </a>
+
+        <!-- Desktop Links -->
+        <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
+          <a href="index.html" class="hover:text-blue-400 transition-colors"
+            >Home</a
+          >
+          <a
+            href="grammar.html"
+            class="hover:text-blue-400 transition-colors text-blue-400"
+            >Grammar</a
+          >
+          <div class="relative group">
+            <button
+              id="game-btn"
+              onclick="toggleDropdown(event)"
+              class="flex items-center gap-1 hover:text-blue-400 transition-colors outline-none text-slate-100"
+            >
+              Game
+              <span id="game-arrow" class="transition-transform duration-300"
+                >▾</span
+              >
+            </button>
+            <div
+              id="game-dropdown"
+              class="dropdown-content glass-card p-2 shadow-2xl"
+            >
+              <a
+                href="mission1.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🚀 Galaxy Exploration</a
+              >
+              <a
+                href="whereami.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🧩 Galactic Riddle</a
+              >
+              <a
+                href="phrasalverbs.html"
+                class="block px-4 py-3 hover:bg-white/5 rounded-xl transition-colors"
+                >🧬 Phrasal Fusion</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Toggle Button -->
+        <div class="md:hidden">
+          <button
+            id="hamburger-btn"
+            onclick="toggleMobileMenu()"
+            class="text-3xl focus:outline-none transition-transform active:scale-90"
+          >
+            <span id="menu-icon">☰</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay (Synchronized with index.html) -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-[90] glass-card rounded-none flex flex-col p-8 pt-24 space-y-8 md:hidden"
+    >
+      <div class="flex flex-col space-y-6 text-xl font-bold">
+        <a
+          href="index.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4"
+          >Home</a
+        >
+        <a
+          href="grammar.html"
+          onclick="toggleMobileMenu()"
+          class="border-b border-white/5 pb-4 text-blue-400"
+          >Grammar</a
+        >
+        <div class="space-y-4 pt-2">
+          <p class="text-xs font-mono text-blue-400 uppercase tracking-widest">
+            Training Modules
+          </p>
+          <a
+            href="mission1.html"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🚀 Galaxy Exploration</a
+          >
+          <a
+            href="whereami.html"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧩 Galactic Riddle</a
+          >
+          <a
+            href="phrasalverbs.html"
+            class="flex items-center gap-3 text-lg font-medium hover:text-blue-400"
+            >🧬 Phrasal Fusion</a
+          >
+        </div>
+      </div>
+      <div class="mt-auto text-center">
+        <p class="text-[10px] text-slate-500 font-mono tracking-widest">
+          AstraLingo OS v2.0
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-28 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Left Sidebar Navigation -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border-slate-800">
+            <h3
+              class="space-font text-xs text-blue-400 font-bold uppercase tracking-wider mb-4 flex items-center justify-between"
+            >
+              <span>ARCHIVE COMPARTMENTS</span>
+              <span
+                class="animate-ping w-2 h-2 rounded-full bg-blue-500"
+              ></span>
+            </h3>
+            <div id="topics-list" class="space-y-2">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Main Content Panel -->
+        <div class="lg:col-span-8">
+          <div
+            id="content-card"
+            class="glass-card rounded-3xl p-8 border-slate-800 min-h-[400px] transition-all duration-300"
+          >
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Startup Protocol Overlay -->
+    <div
+      id="startup-overlay"
+      class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 z-[110]"
+    >
+      <div
+        class="glass-card max-w-md w-full rounded-3xl p-8 border-slate-800 text-center space-y-6"
+      >
+        <span class="text-5xl inline-block animate-pulse">🛠️</span>
+        <h2 class="text-2xl font-bold tracking-tight text-white space-font">
+          STARTUP PROTOCOL
+        </h2>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          Cadet account detected. Please select whether you want to resume your
+          learning progress or perform a total archive wipe.
+        </p>
+        <div class="flex flex-col gap-3">
+          <button
+            onclick="startupRestore()"
+            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold tracking-wider space-font text-xs transition-all shadow-lg hover:shadow-blue-500/20"
+          >
+            CONTINUE CADET JOURNEY 🚀
+          </button>
+          <button
+            onclick="startupReset()"
+            class="w-full py-3.5 rounded-xl border border-slate-700 hover:bg-white/5 text-slate-400 hover:text-white font-bold tracking-wider space-font text-xs transition-all"
+          >
+            WIPE ALL LOCAL ARCHIVES 🔄
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script Game Logic & UI Interactions -->
+    <script>
+      // Desktop Nav Dropdown Toggle
+      function toggleDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById("game-dropdown");
+        const arrow = document.getElementById("game-arrow");
+        const isActive = dropdown.classList.contains("active");
+
+        dropdown.classList.toggle("active");
+        if (arrow) {
+          arrow.style.transform = isActive ? "rotate(0deg)" : "rotate(180deg)";
+        }
+      }
+
+      // Mobile Menu Overlay Toggle
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        const icon = document.getElementById("menu-icon");
+        const isOpening = !menu.classList.contains("open");
+
+        menu.classList.toggle("open");
+        icon.innerText = isOpening ? "✕" : "☰";
+
+        // Scroll lock saat mobile menu overlay terbuka
+        document.body.style.overflow = isOpening ? "hidden" : "auto";
+      }
+
+      // Tutup otomatis dropdown saat klik sembarang di luar menu
+      window.addEventListener("click", function (e) {
+        const dropdown = document.getElementById("game-dropdown");
+        const gameBtn = document.getElementById("game-btn");
+        const arrow = document.getElementById("game-arrow");
+
+        if (dropdown && dropdown.classList.contains("active")) {
+          if (gameBtn && !gameBtn.contains(e.target)) {
+            dropdown.classList.remove("active");
+            if (arrow) arrow.style.transform = "rotate(0deg)";
+          }
+        }
+      });
+
+      // Database Materi Grammar
+      const topics = [
+        {
+          title: "Present Simple (To Be)",
+          level: "A1 - Inner Core",
+          description:
+            "Digunakan untuk menyatakan fakta, identitas, status, atau kondisi saat ini.",
+          structure: "Subject + am/is/are + Adjective/Noun/Adverb",
+          tip: "Gunakan 'am' untuk I, 'is' untuk He/She/It, dan 'are' untuk You/We/They.",
+          examples: [
+            { eng: "I am a cadet.", ind: "Saya adalah seorang kadet." },
+            {
+              eng: "The spaceship is ready.",
+              ind: "Pesawat luar angkasa itu siap.",
+            },
+          ],
+        },
+        {
+          title: "Present Simple (Verbs)",
+          level: "A1 - Inner Core",
+          description:
+            "Digunakan untuk menyatakan rutinitas sehari-hari, kebiasaan, atau fakta ilmiah umum.",
+          structure: "Subject + Verb 1 (-s/-es untuk He/She/It)",
+          tip: "Tambahkan akhiran -s/-es pada kata kerja jika subjeknya tunggal (He, She, It).",
+          examples: [
+            {
+              eng: "The sun rises in the east.",
+              ind: "Matahari terbit di sebelah timur.",
+            },
+            {
+              eng: "They monitor space signals.",
+              ind: "Mereka memantau sinyal luar angkasa.",
+            },
+          ],
+        },
+        {
+          title: "Imperatives",
+          level: "A1 - Inner Core",
+          description: "Kalimat perintah atau instruksi langsung tanpa subjek.",
+          structure: "Verb 1 + Object / Complement !",
+          tip: "Gunakan bentuk dasar kata kerja (bare infinitive) langsung di awal kalimat.",
+          examples: [
+            { eng: "Launch the thrusters!", ind: "Nyalakan mesin pendorong!" },
+            {
+              eng: "Do not touch the red button.",
+              ind: "Jangan sentuh tombol merah itu.",
+            },
+          ],
+        },
+        {
+          title: "Past Simple",
+          level: "A2 - Trade Belt",
+          description:
+            "Digunakan untuk menceritakan kejadian atau aktivitas yang selesai di masa lampau.",
+          structure: "Subject + Verb 2",
+          tip: "Gunakan kata kerja bentuk kedua (regular -ed atau irregular verb) dan keterangan waktu lampau (yesterday, last week).",
+          examples: [
+            {
+              eng: "We encountered a black hole yesterday.",
+              ind: "Kami menemui lubang hitam kemarin.",
+            },
+            {
+              eng: "The captain landed the shuttle safely.",
+              ind: "Kapten mendaratkan pesawat ulang-alik dengan aman.",
+            },
+          ],
+        },
+        {
+          title: "Past Continuous",
+          level: "A2 - Trade Belt",
+          description:
+            "Digunakan untuk menjelaskan aksi yang sedang berlangsung pada titik waktu tertentu di masa lalu.",
+          structure: "Subject + was/were + Verb-ing",
+          tip: "Gunakan 'was' untuk I/He/She/It dan 'were' untuk You/We/They.",
+          examples: [
+            {
+              eng: "We were working in the lab when the alarm rang.",
+              ind: "Kami sedang bekerja di lab saat alarm berbunyi.",
+            },
+            {
+              eng: "Stars were shining brightly last night.",
+              ind: "Bintang-bintang sedang bersinar terang tadi malam.",
+            },
+          ],
+        },
+        {
+          title: "Comparatives",
+          level: "A2 - Trade Belt",
+          description:
+            "Digunakan untuk membandingkan perbedaan antara dua objek.",
+          structure:
+            "Subject + To Be + Adjective-er / More Adjective + Than + Object",
+          tip: "Tambahkan -er untuk kata pendek (1 suku kata) dan 'more' untuk kata panjang (2+ suku kata).",
+          examples: [
+            {
+              eng: "Jupiter is bigger than Mars.",
+              ind: "Jupiter lebih besar daripada Mars.",
+            },
+            {
+              eng: "The warp drive is more expensive than standard engines.",
+              ind: "Mesin warp lebih mahal daripada mesin standar.",
+            },
+          ],
+        },
+        {
+          title: "Present Perfect",
+          level: "B1 - Outer Rim",
+          description:
+            "Digunakan untuk menyatakan peristiwa yang terjadi di masa lalu namun efek atau progresnya masih berlangsung hingga sekarang.",
+          structure: "Subject + have/has + Verb 3",
+          tip: "Gunakan 'has' untuk subjek tunggal (He/She/It) dan 'have' untuk subjek lainnya.",
+          examples: [
+            {
+              eng: "I have explored three planetary systems.",
+              ind: "Saya telah menjelajahi tiga sistem planet.",
+            },
+            {
+              eng: "The satellite has sent new data.",
+              ind: "Satelit itu telah mengirimkan data baru.",
+            },
+          ],
+        },
+        {
+          title: "Conditionals",
+          level: "B1 - Outer Rim",
+          description:
+            "Kalimat pengandaian untuk menyatakan sebab-akibat berdasarkan situasi tertentu.",
+          structure: "If + Present Simple, Subject + will + Verb 1",
+          tip: "Sektor ini berfokus pada First Conditional (kemungkinan nyata di masa depan).",
+          examples: [
+            {
+              eng: "If the engine fails, the backup power will activate.",
+              ind: "Jika mesin gagal, daya cadangan akan aktif.",
+            },
+            {
+              eng: "If we speed up, we will escape the gravity pull.",
+              ind: "Jika kita mempercepat, kita akan lolos dari tarikan gravitasi.",
+            },
+          ],
+        },
+        {
+          title: "Passive Voice",
+          level: "B1 - Outer Rim",
+          description:
+            "Digunakan saat tindakan atau objek yang menerima tindakan lebih penting daripada pelaku tindakan.",
+          structure: "Object + To Be + Verb 3 + (by Subject)",
+          tip: "Gunakan To Be yang sesuai dengan tenses aslinya diikuti kata kerja bentuk ketiga.",
+          examples: [
+            {
+              eng: "The energy shield was activated by the captain.",
+              ind: "Perisai energi diaktifkan oleh kapten.",
+            },
+            {
+              eng: "Alien signals are being analyzed right now.",
+              ind: "Sinyal alien sedang dianalisis saat ini.",
+            },
+          ],
+        },
+      ];
+
+      // Kunci Jawaban Kuis (Diperluas untuk fleksibilitas clue baru)
+      const sol = [
+        ["am"], // LOG 01 (be)
+        ["flies", "travels", "fly", "travel"], // LOG 02 (fly)
+        ["launch", "start", "engage"], // LOG 03 (launch)
+        ["saw", "encountered", "passed"], // LOG 04 (encounter)
+        ["were sleeping", "were working", "were flying", "were eating"], // LOG 05 (work)
+        ["bigger", "larger"], // LOG 06 (big)
+        ["have mapped", "have successfully mapped", "have, mapped", "have"], // LOG 07 (map) -> mendukung "have mapped", "have, mapped", "have", dsb.
+        ["will start", "will activate", "starts", "activates"], // LOG 08 (activate)
+        ["was activated", "is activated"], // LOG 09 (activate)
+        ["learn", "study", "use"], // LOG 10 (learn)
+      ];
+
+      let currentTopicIndex = 0;
+
+      // Inisialisasi Latar Belakang Bintang
+      function initStars() {
+        const starfield = document.getElementById("starfield");
+        starfield.innerHTML = "";
+        const count = 40;
+        for (let i = 0; i < count; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          const size = Math.random() * 2 + 1;
+          star.style.width = `${size}px`;
+          star.style.height = `${size}px`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.animationDelay = `${Math.random() * 3}s`;
+          starfield.appendChild(star);
+        }
+      }
+
+      // Memuat Konten Slide Aktif secara Dinamis
+      function loadTopic(index) {
+        currentTopicIndex = index;
+
+        // Perbarui highlight visual di sidebar
+        const items = document.querySelectorAll(".topic-item");
+        items.forEach((item, i) => {
+          if (i === index) {
+            item.classList.add(
+              "bg-blue-600/20",
+              "text-blue-400",
+              "border-blue-500/40",
+            );
+            item.classList.remove("text-slate-400", "border-transparent");
+          } else {
+            item.classList.remove(
+              "bg-blue-600/20",
+              "text-blue-400",
+              "border-blue-500/40",
+            );
+            item.classList.add("text-slate-400", "border-transparent");
+          }
+        });
+
+        const card = document.getElementById("content-card");
+
+        // Render Final Assessment (Kuis dengan Clue Kata Kerja Baru)
+        if (index === topics.length) {
+          card.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                <div>
+                  <span class="text-xs space-font text-blue-400 font-bold uppercase tracking-wider">COMMAND TEST</span>
+                  <h2 class="text-2xl font-bold tracking-tight mt-1 text-white">FINAL ASSESSMENT</h2>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30">10 QUESTIONS</span>
+              </div>
+              
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Complete the missing gaps in the starship logs below using the correct grammatical structures. Use the provided base verb clues in parenthetical <span class="text-blue-400 font-mono font-semibold">(blue)</span> text to guide your conjugation!
+              </p>
+
+              <form id="quiz-form" onsubmit="event.preventDefault(); checkQuiz();" class="space-y-6 pt-4">
+                <!-- Q1 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 01: Present Simple (To Be)</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"I</span>
+                    <input type="text" id="q0" class="w-full sm:w-48 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">a cadet at AstraLingo Academy." <span class="text-blue-400 font-mono font-bold">(be)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 02: Present Simple (Verbs)</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"Our starship</span>
+                    <input type="text" id="q1" class="w-full sm:w-48 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">around the galaxy on solar power." <span class="text-blue-400 font-mono font-bold">(fly)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 03: Imperatives</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <input type="text" id="q2" class="w-full sm:w-48 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">the thrusters immediately before the gravity pull drags us in!" <span class="text-blue-400 font-mono font-bold">(launch)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 04: Past Simple</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"Yesterday, we</span>
+                    <input type="text" id="q3" class="w-full sm:w-48 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">a giant stellar rift in Sector-9." <span class="text-blue-400 font-mono font-bold">(encounter / see)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 05: Past Continuous</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"While we</span>
+                    <input type="text" id="q4" class="w-full sm:w-64 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">in the navigation room, the alert rang." <span class="text-blue-400 font-mono font-bold">(work / sleep)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 06: Comparatives</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"Jupiter's atmospheric pressure is</span>
+                    <input type="text" id="q5" class="w-full sm:w-48 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">than Mars." <span class="text-blue-400 font-mono font-bold">(big)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 07: Present Perfect</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"I</span>
+                    <input type="text" id="q6" class="w-full sm:w-64 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">three black hole horizons so far." <span class="text-blue-400 font-mono font-bold">(map)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 08: Conditionals (First)</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"If the warp engine fails, the backup reserve battery</span>
+                    <input type="text" id="q7" class="w-full sm:w-64 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here...">
+                    <span class="text-slate-300 text-sm">." <span class="text-blue-400 font-mono font-bold">(activate)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q9 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 09: Passive Voice</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"The main energy shield</span>
+                    <input type="text" id="q8" class="w-full sm:w-64 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here..">
+                    <span class="text-slate-300 text-sm">by the Captain in yesterday's meteor storm." <span class="text-blue-400 font-mono font-bold">(activate)</span></span>
+                  </div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-mono text-slate-400">LOG 10: General Review</label>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <span class="text-slate-300 text-sm">"We must</span>
+                    <input type="text" id="q9" class="w-full sm:w-48 bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Type here..">
+                    <span class="text-slate-300 text-sm">English continuously to coordinate with multi-galactic fleets." <span class="text-blue-400 font-mono font-bold">(learn)</span></span>
+                  </div>
+                </div>
+
+                <div class="flex gap-4 pt-4 border-t border-slate-800">
+                  <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold tracking-wider space-font text-xs transition-all shadow-lg hover:shadow-blue-500/20">
+                    TRANSMIT ARCHIVE LOG 📡
+                  </button>
+                  <button type="button" onclick="resetQuiz()" class="px-6 py-3 rounded-xl border border-slate-700 hover:bg-white/5 text-slate-400 hover:text-white font-bold tracking-wider space-font text-xs transition-all">
+                    CLEAR TERMINAL
+                  </button>
+                </div>
+              </form>
+
+              <div id="quiz-feedback" class="hidden"></div>
+            </div>
+          `;
+          return;
+        }
+
+        // Render Slide Pembelajaran Standar
+        const t = topics[index];
+        card.innerHTML = `
+          <div class="space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+              <div>
+                <span class="text-xs space-font text-blue-400 font-bold uppercase tracking-wider">${t.level}</span>
+                <h2 class="text-2xl font-bold tracking-tight mt-1 text-white">${t.title}</h2>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">VERIFIED</span>
+            </div>
+
+            <p class="text-slate-300 text-sm leading-relaxed">
+              ${t.description}
+            </p>
+
+            <!-- Formula/Structure Box -->
+            <div class="p-5 rounded-2xl border border-slate-800 bg-slate-950/60 space-y-2">
+              <span class="text-xs space-font text-blue-400 uppercase tracking-widest block font-bold">STRUCTURAL COMPARTMENT:</span>
+              <p class="text-lg font-bold text-white tracking-wide space-font">${t.structure}</p>
+            </div>
+
+            <!-- Tip Box -->
+            <div class="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 text-xs text-slate-300 flex items-start gap-3">
+              <span class="text-lg">💡</span>
+              <div>
+                <strong class="text-blue-400">Lab Tip:</strong> ${t.tip}
+              </div>
+            </div>
+
+            <!-- Examples -->
+            <div class="space-y-4">
+              <span class="text-xs space-font text-slate-400 uppercase tracking-widest block">TELEMETRY EXAMPLES:</span>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${t.examples
+                  .map(
+                    (ex) => `
+                  <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                    <p class="text-white font-bold text-sm">"${ex.eng}"</p>
+                    <p class="text-slate-400 text-xs mt-1.5 italic">${ex.ind}</p>
+                  </div>
+                `,
+                  )
+                  .join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Verifikasi Jawaban Kuis Komprehensif
+      function checkQuiz() {
+        let score = 0;
+        for (let i = 0; i < 10; i++) {
+          const val = document
+            .getElementById(`q${i}`)
+            .value.toLowerCase()
+            .trim();
+          const isCorrect = sol[i].some(
+            (s) =>
+              val === s || val.replace(/\s+/g, "") === s.replace(/\s+/g, ""),
+          );
+          const el = document.getElementById(`q${i}`);
+          if (isCorrect) {
+            score++;
+            el.style.borderColor = "#10b981";
+            el.style.background = "rgba(16, 185, 129, 0.1)";
+          } else {
+            el.style.borderColor = "#ef4444";
+            el.style.background = "rgba(239, 68, 68, 0.1)";
+          }
+        }
+        const fb = document.getElementById("quiz-feedback");
+        fb.classList.remove("hidden");
+        if (score === 10) {
+          fb.innerHTML = "🏆 MISSION SUCCESS! ALL DATA SYNCHRONIZED.";
+          fb.className =
+            "mt-8 p-8 rounded-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500";
+          localStorage.setItem("astralingo_final_quiz_v12_done", "true");
+        } else {
+          fb.innerHTML = `⚠️ ACCESS DENIED: ${score}/10 CORRECT. RE-READ ARCHIVES.`;
+          fb.className =
+            "mt-8 p-8 rounded-3xl bg-red-500/20 text-red-400 border border-red-500";
+        }
+      }
+
+      // Membersihkan Input Jawaban Kuis
+      function resetQuiz() {
+        for (let i = 0; i < 10; i++) {
+          const el = document.getElementById(`q${i}`);
+          if (el) {
+            el.value = "";
+            el.style.borderColor = "";
+            el.style.background = "";
+          }
+        }
+        const fb = document.getElementById("quiz-feedback");
+        if (fb) {
+          fb.classList.add("hidden");
+          fb.innerHTML = "";
+        }
+      }
+
+      // Penanganan Startup Protocol
+      function startupRestore() {
+        document.getElementById("startup-overlay").classList.add("hidden");
+        loadTopic(0);
+      }
+
+      function startupReset() {
+        localStorage.removeItem("astralingo_final_quiz_v12_done");
+        document.getElementById("startup-overlay").classList.add("hidden");
+        loadTopic(0);
+      }
+
+      // Event Inisialisasi DOM
+      document.addEventListener("DOMContentLoaded", () => {
+        initStars();
+
+        // Membangun daftar topik di sidebar secara dinamis
+        const list = document.getElementById("topics-list");
+        topics.forEach((t, i) => {
+          const item = document.createElement("button");
+          item.className =
+            "topic-item w-full p-3 rounded-xl border border-transparent text-left text-sm font-semibold hover:bg-white/5 transition-all flex justify-between items-center";
+          item.onclick = () => loadTopic(i);
+          item.innerHTML = `
+            <span>${t.title}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-slate-400">${t.level.split(" ")[0]}</span>
+          `;
+          list.appendChild(item);
+        });
+
+        // Menambahkan tombol Kuis Evaluasi ke bagian bawah sidebar
+        const testBtn = document.createElement("button");
+        testBtn.className =
+          "topic-item w-full p-3 rounded-xl border border-transparent text-left text-sm font-semibold hover:bg-white/5 transition-all flex justify-between items-center";
+        testBtn.onclick = () => loadTopic(topics.length);
+        testBtn.innerHTML = `
+          <span>Final Assessment</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">TEST</span>
+        `;
+        list.appendChild(testBtn);
+
+        // Memeriksa status pengerjaan quiz sebelumnya
+        if (localStorage.getItem("astralingo_final_quiz_v12_done")) {
+          document.getElementById("startup-overlay").classList.remove("hidden");
+        } else {
+          document.getElementById("startup-overlay").classList.add("hidden");
+          loadTopic(0);
+        }
+      });
+    </script>
+  </body>
+</html>
